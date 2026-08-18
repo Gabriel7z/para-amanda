@@ -105,6 +105,16 @@ Eu te amo, meu grande amor! 🥺❤️`,
     { src: "fotos/18.jpg", legenda: "Linda assim" },
     { src: "fotos/19.jpg", legenda: "A gente" },
     { src: "fotos/20.jpg", legenda: "Meu lugar favorito" },
+    { src: "fotos/21.jpg", legenda: "A gente arrumado" },
+    { src: "fotos/22.jpg", legenda: "Pertinho de você" },
+    { src: "fotos/23.jpg", legenda: "Um dia de sol e você" },
+    { src: "fotos/24.jpg", legenda: "O jeito que você cuida" },
+    { src: "fotos/25.jpg", legenda: "Vivendo o seu sonho" },
+    { src: "fotos/26.jpg", legenda: "Essa timidez linda" },
+    { src: "fotos/27.jpg", legenda: "Dançando na sala" },
+    { src: "fotos/28.jpg", legenda: "O nosso jeito bobo" },
+    { src: "fotos/29.jpg", legenda: "Você, em silêncio" },
+    { src: "fotos/30.jpg", legenda: "Um dia de festa" },
   ],
 
   promessas: [
@@ -113,6 +123,94 @@ Eu te amo, meu grande amor! 🥺❤️`,
     "Celebrar cada vitória sua como se fosse minha",
     "Cuidar do “nós” com a mesma atenção que cuido de você",
     "Te amar de um jeito calmo, constante e sincero",
+  ],
+
+  // Bilhetes para ela abrir no dia certo, um por vez.
+  bilhetes: [
+    {
+      quando: "Abra quando estiver triste",
+      texto: `Amor, vai ter dias que são difíceis de suportar, dias em que parece impossível passar, dor esmagadora. Mas lembra: isso é apenas uma fase, e você é maior que tudo isso.
+
+Eu tenho muito, muito orgulho de você — da mulher que você é, da namorada que você é!
+
+Eu só tenho a agradecer a Deus por ter me agraciado com uma mulher tão incrível! 🥺❤️`,
+    },
+    {
+      quando: "Abra quando bater saudade de mim",
+      texto: `Se você está lendo isso, é quase certo que eu também estou com saudade agora.
+
+Fecha os olhos e lembra do abraço: cabeça com cabeça, o mundo inteiro sumindo. Enquanto eu não chego, coloca a nossa música e olha as nossas fotos aqui.
+
+Saudade é só a prova de que é bom demais estar junto.`,
+    },
+    {
+      quando: "Abra quando a gente brigar",
+      texto: `É, meu amorzinho... mais uma briga. Eu já peço desculpas desde agora 😭😭😭
+
+Eu errei tentando acertar, meu amorzinho. Paciência comigo, minha princesa. Aceita as minhas desculpas: eu sei que eu erro, que eu falo besteira, que às vezes eu faço as coisas ficarem mais difíceis. Eu te amo muito, muito, muito!
+
+E não é intencional. Às vezes eu não sei expressar, sabe, amor, a vontade que eu tenho de você.
+
+Me perdoa, meu amor. Cada dia eu tento melhorar um pouquinho! 😔🥺❤️`,
+    },
+    {
+      quando: "Abra quando duvidar de você mesma",
+      texto: `Amor, eu tenho orgulho de você. Da mulher que você é e da profissional que você está se tornando.
+
+Eu vejo o seu esforço de perto. Vejo você cansada e indo de novo. Isso não é sorte nem talento: é caráter, e você tem.
+
+Se hoje você não consegue ver isso em você, acredita no que eu vejo: eu tenho total certeza sobre você. Sempre tive.`,
+    },
+    {
+      quando: "Abra num dia bom",
+      texto: `Se hoje foi um dia bonito, eu quero estar dentro dele com você. Me conta tudo, com detalhes, do jeito comprido que você conta — eu amo.
+
+E guarda isso: você merece dias assim, muitos. Não é sorte, é você.
+
+Eu louvo a Deus por cada dia bom que a vida te dá, e por poder ver de pertinho.`,
+    },
+    {
+      quando: "Abra antes de dormir",
+      texto: `Boa noite, meu amor.
+
+Se você chegou até aqui hoje, já deu tudo certo — já é motivo de agradecer.
+
+Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorriso bobo na cara. Eu te amo. Amanhã eu te amo de novo.`,
+    },
+  ],
+
+  // Um motivo diferente por dia. Ela abre o site e encontra o de hoje.
+  motivosDoDia: [
+    "Hoje eu te amo pelo seu sorriso, que continua sendo a melhor notícia do meu dia.",
+    "Hoje eu te amo pela paciência que você tem comigo, mesmo quando eu não mereço.",
+    "Hoje eu te amo pelo jeito que você fala dos seus sonhos, com os olhos brilhando.",
+    "Hoje eu te amo por você ter ficado, mesmo nos dias em que eu estava difícil.",
+    "Hoje eu te amo pelo seu abraço, que é o único lugar em que eu descanso de verdade.",
+    "Hoje eu te amo pela sua fé, que muitas vezes segurou a minha.",
+    "Hoje eu te amo pelo som da sua risada quando eu falo alguma besteira.",
+    "Hoje eu te amo por você me escutar até quando eu não sei explicar o que estou sentindo.",
+    "Hoje eu te amo pela sua coragem de continuar estudando, cansada, e ir de novo.",
+    "Hoje eu te amo por você acreditar em mim antes de eu acreditar.",
+    "Hoje eu te amo pelo jeito que você cuida das pessoas sem ninguém pedir.",
+    "Hoje eu te amo porque com você até o dia comum fica bonito.",
+    "Hoje eu te amo pela sua honestidade, mesmo quando dói ouvir.",
+    "Hoje eu te amo pelo seu perdão, que eu já usei tantas vezes.",
+    "Hoje eu te amo pelo jeito que você me chama quando está feliz.",
+    "Hoje eu te amo porque você virou a minha casa, e não só a minha namorada.",
+    "Hoje eu te amo pela sua teimosia boa, a que não deixa a gente desistir.",
+    "Hoje eu te amo por cada tijolinho que a gente colocou nessa vida juntos.",
+    "Hoje eu te amo pelo seu silêncio do meu lado, que já é conversa.",
+    "Hoje eu te amo porque você me faz querer ser um homem melhor, sem me cobrar.",
+    "Hoje eu te amo pelo jeito que você fica linda sem tentar.",
+    "Hoje eu te amo por você ser a primeira pessoa que eu quero contar tudo.",
+    "Hoje eu te amo pela força que você tem e nem percebe.",
+    "Hoje eu te amo pela sua fome de viver as coisas comigo.",
+    "Hoje eu te amo por você aguentar o meu jeito e ainda me achar graça.",
+    "Hoje eu te amo pelo futuro que eu vejo quando eu olho você.",
+    "Hoje eu te amo pelo carinho que você tem com a sua família e com a minha.",
+    "Hoje eu te amo porque você é a água do meu rio e o sol nos meus dias de frio.",
+    "Hoje eu te amo por você ter dito sim, e por continuar dizendo todos os dias.",
+    "Hoje eu te amo simplesmente porque é você. E isso já bastaria.",
   ],
 
   fraseFinal: "Eu te amo, Amanda. E vou continuar te amando.",

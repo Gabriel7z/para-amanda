@@ -83,6 +83,14 @@
         <a class="btn-rolar" href="#carta">Ler a carta ↓</a>
       </section>
 
+      <section class="motivo-secao" id="motivoDoDia" hidden>
+        <div class="motivo-dia">
+          <p class="motivo-dia-olho">o motivo de hoje</p>
+          <p class="motivo-dia-texto" id="motivoDiaTexto"></p>
+          <p class="motivo-dia-nota">amanhã tem outro, e depois outro</p>
+        </div>
+      </section>
+
       <section class="secao carta-secao" id="carta">
         <div class="papel revelar">
           <p class="papel-topo">minha carta</p>
@@ -111,6 +119,13 @@
         <p class="secao-olho revelar">memórias</p>
         <h2 class="secao-titulo revelar">Um álbum só nosso</h2>
         <p class="secao-sub revelar">Cada quadro espera uma memória nossa.</p>
+        <div class="galeria-acao revelar">
+          <button type="button" class="btn-cinema" id="btnCinema">
+            <span class="btn-cinema-play" aria-hidden="true">▶</span>
+            Assistir a nossa história
+          </button>
+          <p class="galeria-nota">as nossas fotos em tela cheia, com a nossa música</p>
+        </div>
         <div class="polaroides" id="polaroides"></div>
       </section>
 
@@ -131,6 +146,16 @@
         <p class="secao-olho revelar">o que eu te prometo</p>
         <h2 class="secao-titulo revelar">Para os dias que ainda vamos viver</h2>
         <ul class="lista-promessas" id="listaPromessas"></ul>
+      </section>
+
+      <section class="secao bilhetes-secao" id="bilhetes" hidden>
+        <p class="secao-olho revelar">para guardar</p>
+        <h2 class="secao-titulo revelar">Bilhetes lacrados</h2>
+        <p class="secao-sub revelar">
+          Escrevi cada um pensando num dia seu. Abra no dia certo — eles esperam
+          por você.
+        </p>
+        <div class="grade-bilhetes" id="gradeBilhetes"></div>
       </section>
 
       <section class="final" id="final">
@@ -157,6 +182,38 @@
         <figcaption id="lightboxLegenda"></figcaption>
       </figure>
       <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Próxima">›</button>
+    </div>
+
+    <div id="cinema" class="cinema" hidden>
+      <div class="cinema-palco">
+        <div class="cinema-quadro" id="cinemaA">
+          <div class="cinema-fundo"></div>
+          <img alt="" />
+        </div>
+        <div class="cinema-quadro" id="cinemaB">
+          <div class="cinema-fundo"></div>
+          <img alt="" />
+        </div>
+      </div>
+      <p class="cinema-legenda" id="cinemaLegenda"></p>
+      <div class="cinema-fim" id="cinemaFim" hidden>
+        <p class="cinema-fim-frase" id="cinemaFimFrase"></p>
+        <button type="button" class="btn-cinema" id="cinemaRepetir">Ver de novo</button>
+      </div>
+      <div class="cinema-barra" aria-hidden="true"><span id="cinemaProgresso"></span></div>
+      <button type="button" class="cinema-btn cinema-pausa" id="cinemaPausa" aria-label="Pausar">❚❚</button>
+      <button type="button" class="cinema-btn cinema-fechar" id="cinemaFechar" aria-label="Fechar">×</button>
+    </div>
+
+    <div id="bilheteModal" class="bilhete-modal" hidden>
+      <button type="button" class="bilhete-fechar" id="bilheteFechar" aria-label="Fechar">×</button>
+      <article class="bilhete-papel">
+        <p class="bilhete-modal-quando" id="bilheteQuando"></p>
+        <div class="bilhete-modal-texto" id="bilheteTexto"></div>
+        <p class="bilhete-modal-assinatura">
+          <span data-campo="seuNome">Gabriel</span>
+        </p>
+      </article>
     </div>
 
     <script src="config.js"></script>

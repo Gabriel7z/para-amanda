@@ -68,6 +68,7 @@
 
   const GIROS = [-3.2, 2.4, -1.6, 3.5, -2.8, 1.9, -3.6, 2.8, -1.2, 3.1];
   const album = [];
+  let tocarMusica = null;
 
   function carregarFoto(quadro, src, alt) {
     const img = document.createElement("img");
@@ -163,6 +164,233 @@
       if (e.key === "Escape") fechar();
       if (e.key === "ArrowLeft") mostrar(atual - 1);
       if (e.key === "ArrowRight") mostrar(atual + 1);
+    });
+  }
+
+  function montarMotivoDoDia() {
+    const secao = $("#motivoDoDia");
+    const alvo = $("#motivoDiaTexto");
+    const lista = CONFIG.motivosDoDia;
+    if (!secao || !alvo || !Array.isArray(lista) || !lista.length) return;
+
+    const inicio = new Date(CONFIG.dataNamoro + "T00:00:00");
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const dias = Math.floor((hoje - inicio) / 86400000);
+    const i = ((dias % lista.length) + lista.length) % lista.length;
+
+    alvo.textContent = lista[i];
+    secao.hidden = false;
+  }
+
+  const CHAVE_BILHETES = "para-amanda:bilhetes";
+
+  function bilhetesAbertos() {
+    try {
+      const lista = JSON.parse(localStorage.getItem(CHAVE_BILHETES) || "[]");
+      return Array.isArray(lista) ? lista : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function marcarBilhete(indice) {
+    try {
+      const lista = bilhetesAbertos();
+      if (lista.indexOf(indice) === -1) {
+        lista.push(indice);
+        localStorage.setItem(CHAVE_BILHETES, JSON.stringify(lista));
+      }
+    } catch (e) {
+      // sem armazenamento o bilhete abre igual, só não fica marcado
+    }
+  }
+
+  function abrirBilhete(indice, botao) {
+    const bilhete = CONFIG.bilhetes[indice];
+    const modal = $("#bilheteModal");
+    if (!bilhete || !modal) return;
+
+    $("#bilheteQuando").textContent = bilhete.quando;
+    const corpo = $("#bilheteTexto");
+    corpo.textContent = "";
+    bilhete.texto
+      .trim()
+      .split(/\n\s*\n/)
+      .forEach((paragrafo) => {
+        const p = document.createElement("p");
+        p.textContent = paragrafo.trim();
+        corpo.appendChild(p);
+      });
+
+    modal.hidden = false;
+    document.body.classList.add("bilhete-aberto");
+    marcarBilhete(indice);
+
+    if (botao) {
+      botao.classList.add("aberto");
+      botao.querySelector(".bilhete-abrir").textContent = "ler de novo";
+    }
+  }
+
+  function montarBilhetes() {
+    const secao = $("#bilhetes");
+    const grade = $("#gradeBilhetes");
+    const lista = CONFIG.bilhetes;
+    if (!secao || !grade || !Array.isArray(lista) || !lista.length) return;
+
+    const abertos = bilhetesAbertos();
+    lista.forEach((bilhete, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "bilhete revelar";
+      btn.innerHTML =
+        '<span class="bilhete-lacre" aria-hidden="true">♥</span>' +
+        '<span class="bilhete-quando"></span>' +
+        '<span class="bilhete-abrir"></span>';
+      btn.querySelector(".bilhete-quando").textContent = bilhete.quando;
+      const jaAberto = abertos.indexOf(i) !== -1;
+      btn.classList.toggle("aberto", jaAberto);
+      btn.querySelector(".bilhete-abrir").textContent = jaAberto
+        ? "ler de novo"
+        : "abrir";
+      btn.addEventListener("click", () => abrirBilhete(i, btn));
+      grade.appendChild(btn);
+    });
+
+    secao.hidden = false;
+  }
+
+  function iniciarBilhetes() {
+    const modal = $("#bilheteModal");
+    if (!modal) return;
+
+    function fechar() {
+      modal.hidden = true;
+      document.body.classList.remove("bilhete-aberto");
+    }
+
+    $("#bilheteFechar").addEventListener("click", fechar);
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) fechar();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (!modal.hidden && e.key === "Escape") fechar();
+    });
+  }
+
+  function iniciarCinema() {
+    const caixa = $("#cinema");
+    const botao = $("#btnCinema");
+    if (!caixa || !botao) return;
+    if (!album.length) {
+      botao.hidden = true;
+      return;
+    }
+
+    const camadas = [$("#cinemaA"), $("#cinemaB")];
+    const legenda = $("#cinemaLegenda");
+    const progresso = $("#cinemaProgresso");
+    const fim = $("#cinemaFim");
+    const pausa = $("#cinemaPausa");
+    const DURACAO = 4600;
+
+    let indice = 0;
+    let ativa = 1;
+    let timer = null;
+    let pausado = false;
+
+    function preCarregar(i) {
+      if (!album[i]) return;
+      const img = new Image();
+      img.src = album[i].src;
+    }
+
+    function pintar(i) {
+      const foto = album[i];
+      if (!foto) return;
+
+      const proxima = camadas[1 - ativa];
+      const img = proxima.querySelector("img");
+      img.src = foto.src;
+      img.alt = foto.legenda;
+      proxima.querySelector(".cinema-fundo").style.backgroundImage =
+        'url("' + foto.src + '")';
+      proxima.classList.remove("visivel");
+      void proxima.offsetWidth;
+      proxima.classList.add("visivel");
+      camadas[ativa].classList.remove("visivel");
+      ativa = 1 - ativa;
+
+      legenda.textContent = foto.legenda;
+      legenda.classList.remove("aparecer");
+      void legenda.offsetWidth;
+      legenda.classList.add("aparecer");
+
+      progresso.style.width = ((i + 1) / album.length) * 100 + "%";
+      preCarregar(i + 1);
+      preCarregar(i + 2);
+    }
+
+    function agendar() {
+      clearTimeout(timer);
+      timer = setTimeout(avancar, DURACAO);
+    }
+
+    function avancar() {
+      if (indice + 1 >= album.length) {
+        clearTimeout(timer);
+        $("#cinemaFimFrase").textContent = CONFIG.fraseFinal;
+        fim.hidden = false;
+        return;
+      }
+      indice += 1;
+      pintar(indice);
+      agendar();
+    }
+
+    function comecar() {
+      indice = 0;
+      pausado = false;
+      fim.hidden = true;
+      caixa.classList.remove("pausado");
+      pausa.textContent = "❚❚";
+      pintar(0);
+      agendar();
+    }
+
+    function abrir() {
+      caixa.hidden = false;
+      document.body.classList.add("cinema-aberto");
+      comecar();
+      if (tocarMusica) tocarMusica();
+    }
+
+    function fechar() {
+      clearTimeout(timer);
+      caixa.hidden = true;
+      document.body.classList.remove("cinema-aberto");
+    }
+
+    function alternarPausa() {
+      pausado = !pausado;
+      caixa.classList.toggle("pausado", pausado);
+      pausa.textContent = pausado ? "▶" : "❚❚";
+      if (pausado) clearTimeout(timer);
+      else agendar();
+    }
+
+    botao.addEventListener("click", abrir);
+    $("#cinemaFechar").addEventListener("click", fechar);
+    pausa.addEventListener("click", alternarPausa);
+    $("#cinemaRepetir").addEventListener("click", comecar);
+    document.addEventListener("keydown", (e) => {
+      if (caixa.hidden) return;
+      if (e.key === "Escape") fechar();
+      if (e.code === "Space" && !e.target.closest("button")) {
+        e.preventDefault();
+        alternarPausa();
+      }
     });
   }
 
@@ -415,7 +643,7 @@
     const capa = $("#capa");
     const envelope = $("#envelope");
     const site = $("#site");
-    const tocar = musica();
+    tocarMusica = musica();
 
     function abrir() {
       envelope.classList.add("aberto");
@@ -424,7 +652,7 @@
         site.hidden = false;
         site.classList.add("visivel");
         observarRevelar();
-        if (tocar) tocar();
+        if (tocarMusica) tocarMusica();
         setTimeout(() => capa.remove(), 1000);
       }, 650);
     }
@@ -440,11 +668,15 @@
 
   aplicarTextos();
   montarCarta();
+  montarMotivoDoDia();
   montarMotivos();
   montarHistoria();
   montarCapaFoto();
   montarFotos();
   iniciarLightbox();
+  iniciarCinema();
+  montarBilhetes();
+  iniciarBilhetes();
   montarPromessas();
   iniciarContadores();
   petalas();
@@ -452,7 +684,13 @@
 
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
-    if (e.target.closest(".capa, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid")) return;
+    if (
+      e.target.closest(
+        ".capa, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal"
+      )
+    ) {
+      return;
+    }
     soltarCoracao(e.clientX, e.clientY);
   });
 })();
