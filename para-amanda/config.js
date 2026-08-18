@@ -137,11 +137,9 @@ Eu só tenho a agradecer a Deus por ter me agraciado com uma mulher tão incrív
     },
     {
       quando: "Abra quando bater saudade de mim",
-      texto: `Se você está lendo isso, é quase certo que eu também estou com saudade agora.
+      texto: `Se você está lendo isso, é certeza que eu também estou com saudades agora. Eu tenho saudades infinitas de você 🥺❤️
 
-Fecha os olhos e lembra do abraço: cabeça com cabeça, o mundo inteiro sumindo. Enquanto eu não chego, coloca a nossa música e olha as nossas fotos aqui.
-
-Saudade é só a prova de que é bom demais estar junto.`,
+Como eu queria estar ao seu lado agora, sentindo o seu cheiro, o seu toque. Eu sinto falta de você todos os momentos do meu dia. Eu te amooo! 🥺❤️`,
     },
     {
       quando: "Abra quando a gente brigar",
