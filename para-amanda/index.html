@@ -48,6 +48,7 @@
         <p class="hero-olho">uma homenagem para</p>
         <h1 class="hero-nome" data-campo="nomeDela">Amanda</h1>
         <p class="hero-titulo" data-campo="tituloHero">Você é a minha outra metade</p>
+        <div id="capaPolaroid" class="capa-polaroid"></div>
         <div class="marcos">
           <div class="marco">
             <p class="marco-olho">a gente se conhece há</p>
@@ -133,6 +134,16 @@
         <p>Feito com o coração, só para você.</p>
       </footer>
     </main>
+
+    <div id="lightbox" class="lightbox" hidden>
+      <button type="button" class="lightbox-fechar" id="lightboxFechar" aria-label="Fechar">×</button>
+      <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Anterior">‹</button>
+      <figure>
+        <img id="lightboxImg" alt="" />
+        <figcaption id="lightboxLegenda"></figcaption>
+      </figure>
+      <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Próxima">›</button>
+    </div>
 
     <script src="config.js"></script>
     <script src="script.js"></script>

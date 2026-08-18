@@ -66,36 +66,103 @@
     ];
   }
 
+  const GIROS = [-3.2, 2.4, -1.6, 3.5, -2.8, 1.9, -3.6, 2.8, -1.2, 3.1];
+  const album = [];
+
+  function carregarFoto(quadro, src, alt) {
+    const img = document.createElement("img");
+    img.alt = alt;
+    const tentativas = candidatosFoto(src);
+    let i = 0;
+    const tentar = () => {
+      if (i >= tentativas.length) {
+        img.remove();
+        return;
+      }
+      img.src = tentativas[i];
+      i += 1;
+    };
+    img.addEventListener("load", () => {
+      quadro.textContent = "";
+      quadro.appendChild(img);
+    });
+    img.addEventListener("error", tentar);
+    tentar();
+    return img;
+  }
+
+  function criarPolaroid(foto, indice, extraClass) {
+    const fig = document.createElement("figure");
+    fig.className = "polaroid revelar" + (extraClass ? " " + extraClass : "");
+    fig.style.setProperty("--giro", GIROS[indice % GIROS.length] + "deg");
+    const quadro = document.createElement("div");
+    quadro.className = "polaroid-foto";
+    quadro.textContent = "♥";
+    carregarFoto(quadro, foto.src, foto.legenda);
+    const cap = document.createElement("figcaption");
+    cap.textContent = foto.legenda;
+    fig.append(quadro, cap);
+    fig.addEventListener("click", () => abrirFoto(indice));
+    return fig;
+  }
+
+  function montarCapaFoto() {
+    const caixa = $("#capaPolaroid");
+    const foto = CONFIG.fotos[0];
+    if (!caixa || !foto) return;
+    caixa.appendChild(criarPolaroid(foto, 0, "polaroid-capa"));
+  }
+
   function montarFotos() {
     const grade = $("#polaroides");
-    CONFIG.fotos.forEach((foto) => {
-      const fig = document.createElement("figure");
-      fig.className = "polaroid revelar";
-      const quadro = document.createElement("div");
-      quadro.className = "polaroid-foto";
-      quadro.textContent = "♥";
-      const img = document.createElement("img");
+    CONFIG.fotos.forEach((foto, i) => {
+      album.push(foto);
+      grade.appendChild(criarPolaroid(foto, i));
+    });
+  }
+
+  function iniciarLightbox() {
+    const caixa = $("#lightbox");
+    const img = $("#lightboxImg");
+    const cap = $("#lightboxLegenda");
+    if (!caixa) return;
+
+    let atual = 0;
+
+    function mostrar(i) {
+      if (!album.length) return;
+      atual = (i + album.length) % album.length;
+      const foto = album[atual];
+      img.src = foto.src;
       img.alt = foto.legenda;
-      const tentativas = candidatosFoto(foto.src);
-      let i = 0;
-      const tentar = () => {
-        if (i >= tentativas.length) {
-          img.remove();
-          return;
-        }
-        img.src = tentativas[i];
-        i += 1;
-      };
-      img.addEventListener("load", () => {
-        quadro.textContent = "";
-        quadro.appendChild(img);
-      });
-      img.addEventListener("error", tentar);
-      tentar();
-      const cap = document.createElement("figcaption");
       cap.textContent = foto.legenda;
-      fig.append(quadro, cap);
-      grade.appendChild(fig);
+      caixa.hidden = false;
+      document.body.classList.add("lightbox-aberto");
+    }
+
+    function fechar() {
+      caixa.hidden = true;
+      document.body.classList.remove("lightbox-aberto");
+    }
+
+    window.abrirFoto = mostrar;
+    $("#lightboxFechar").addEventListener("click", fechar);
+    $("#lightboxPrev").addEventListener("click", (e) => {
+      e.stopPropagation();
+      mostrar(atual - 1);
+    });
+    $("#lightboxNext").addEventListener("click", (e) => {
+      e.stopPropagation();
+      mostrar(atual + 1);
+    });
+    caixa.addEventListener("click", (e) => {
+      if (e.target === caixa) fechar();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (caixa.hidden) return;
+      if (e.key === "Escape") fechar();
+      if (e.key === "ArrowLeft") mostrar(atual - 1);
+      if (e.key === "ArrowRight") mostrar(atual + 1);
     });
   }
 
@@ -375,7 +442,9 @@
   montarCarta();
   montarMotivos();
   montarHistoria();
+  montarCapaFoto();
   montarFotos();
+  iniciarLightbox();
   montarPromessas();
   iniciarContadores();
   petalas();
@@ -383,7 +452,7 @@
 
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
-    if (e.target.closest(".capa, .btn-musica, a, button, .player-moldura")) return;
+    if (e.target.closest(".capa, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid")) return;
     soltarCoracao(e.clientX, e.clientY);
   });
 })();
