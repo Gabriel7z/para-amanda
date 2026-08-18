@@ -184,6 +184,7 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
     "Hoje eu te amo pelo jeito que você fala dos seus sonhos, com os olhos brilhando.",
     "Hoje eu te amo por você ter ficado, mesmo nos dias em que eu estava difícil.",
     "Hoje eu te amo pelo seu abraço, que é o único lugar em que eu descanso de verdade.",
+    "Eu te amo, meu amor. Eu te amo pelo que você é: linda, charmosa, dengosa, cuidadosa... Eu tenho muito orgulho de você, te amo mil milhões!",
     "Hoje eu te amo pela sua fé, que muitas vezes segurou a minha.",
     "Hoje eu te amo pelo som da sua risada quando eu falo alguma besteira.",
     "Hoje eu te amo por você me escutar até quando eu não sei explicar o que estou sentindo.",
