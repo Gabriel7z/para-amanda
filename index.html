@@ -107,12 +107,34 @@
         <p class="secao-olho revelar">uma homenagem em pedaços</p>
         <h2 class="secao-titulo revelar">O que eu mais amo em você</h2>
         <div class="grade-motivos" id="gradeMotivos"></div>
+        <div class="roleta-bloco revelar">
+          <p class="secao-olho">gira e lê</p>
+          <h3 class="roleta-titulo">A roleta do eu te amo</h3>
+          <p class="secao-sub">Cada vez uma coisa que eu amo em você.</p>
+          <div class="roleta-cena">
+            <div class="roleta-ponteiro" aria-hidden="true"></div>
+            <div class="roleta-roda" id="roletaRoda"></div>
+          </div>
+          <button type="button" class="btn-cinema" id="btnRoleta">Girar</button>
+          <p class="roleta-resultado" id="roletaResultado" hidden></p>
+        </div>
       </section>
 
       <section class="secao historia-secao" id="historia">
         <p class="secao-olho revelar">a gente, em capítulos</p>
         <h2 class="secao-titulo revelar">A nossa história</h2>
         <ol class="linha" id="linhaTempo"></ol>
+      </section>
+
+      <section class="ceu-secao" id="ceu">
+        <p class="secao-olho revelar">22 de outubro de 2022, às oito da noite</p>
+        <h2 class="secao-titulo revelar">O céu do dia em que te conheci</h2>
+        <p class="secao-sub revelar">As mesmas estrelas que estavam no céu naquela hora, no Brasil.</p>
+        <div class="ceu-moldura revelar">
+          <canvas id="ceuCanvas" width="640" height="640" aria-label="O céu da noite em que a gente se conheceu"></canvas>
+          <span class="ceu-norte" aria-hidden="true">N</span>
+        </div>
+        <p class="ceu-frase revelar" data-campo="ceuFrase"></p>
       </section>
 
       <section class="secao" id="galeria">

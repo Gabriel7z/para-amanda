@@ -212,6 +212,21 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
     "Hoje eu te amo simplesmente porque é você. E isso já bastaria.",
   ],
 
+  ceuFrase: "O céu já tinha você. Eu é que ainda não sabia.",
+
+  roleta: [
+    "linda",
+    "charmosa",
+    "dengosa",
+    "cuidadosa",
+    "meu tudo",
+    "mil milhões",
+    "meu orgulho",
+    "minha princesa",
+    "o seu sorriso",
+    "futura esposa",
+  ],
+
   fraseFinal: "Eu te amo, Amanda. E vou continuar te amando.",
 
   // Clipe oficial no canal da dupla (YouTube). Não hospedamos o áudio.
