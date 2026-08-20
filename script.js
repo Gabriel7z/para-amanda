@@ -885,9 +885,50 @@
     }
   }
 
+  function musicaDoDia() {
+    const lista =
+      CONFIG.musicas && CONFIG.musicas.length
+        ? CONFIG.musicas
+        : [
+            {
+              youtubeId: CONFIG.youtubeId,
+              titulo: CONFIG.musicaTitulo || "Duas Metades",
+              artista: CONFIG.musicaArtista || "Jorge & Mateus",
+              frase: "Porque a gente se completa.",
+            },
+          ];
+    const validas = lista.filter((item) => item && item.youtubeId);
+    if (!validas.length) return null;
+    const txt = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    const partes = txt.split("-").map(Number);
+    const dias = Math.floor(Date.UTC(partes[0], partes[1] - 1, partes[2]) / 86400000);
+    return validas[((dias % validas.length) + validas.length) % validas.length];
+  }
+
+  function aplicarMusicaDoDia(hoje) {
+    if (!hoje) return;
+    const btn = $("#btnMusica");
+    const nome = $("#musicaBotaoTexto");
+    const titulo = $("#musicaTitulo");
+    const artista = $("#musicaArtista");
+    const frase = $("#musicaFrase");
+    if (nome) nome.textContent = hoje.titulo;
+    if (titulo) titulo.textContent = hoje.titulo;
+    if (artista) artista.textContent = hoje.artista;
+    if (frase) frase.textContent = hoje.frase || "";
+    if (btn) btn.setAttribute("aria-label", "Tocar " + hoje.titulo);
+  }
+
   function musica() {
     const btn = $("#btnMusica");
-    if (!CONFIG.youtubeId) {
+    const hoje = musicaDoDia();
+    aplicarMusicaDoDia(hoje);
+    if (!hoje || !hoje.youtubeId) {
       btn.hidden = true;
       return;
     }
@@ -916,14 +957,14 @@
       player = new YT.Player("ytplayer", {
         width: "100%",
         height: "100%",
-        videoId: CONFIG.youtubeId,
+        videoId: hoje.youtubeId,
         playerVars: {
           autoplay: querTocar ? 1 : 0,
           rel: 0,
           modestbranding: 1,
           playsinline: 1,
           loop: 1,
-          playlist: CONFIG.youtubeId,
+          playlist: hoje.youtubeId,
           origin: window.location.origin,
           enablejsapi: 1,
         },
@@ -1396,6 +1437,7 @@
 
   aplicarTextos();
   aplicarAvatares();
+  aplicarMusicaDoDia(musicaDoDia());
   montarCarta();
   montarMotivoDoDia();
   montarMotivos();

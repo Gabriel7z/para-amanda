@@ -233,7 +233,25 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
   avatarGabriel: "fotos/avatar-gabriel.jpg",
 
   // Clipe oficial no canal da dupla (YouTube). Não hospedamos o áudio.
-  youtubeId: "HR4ZxjGQGYY",
-  musicaTitulo: "Duas Metades",
-  musicaArtista: "Jorge & Mateus",
+  // Rodízio: uma música por dia, na ordem abaixo, e depois recomeça.
+  musicas: [
+    {
+      youtubeId: "HR4ZxjGQGYY",
+      titulo: "Duas Metades",
+      artista: "Jorge & Mateus",
+      frase: "Porque a gente se completa.",
+    },
+    {
+      youtubeId: "nSSceWPREBA",
+      titulo: "Amo Noite e Dia",
+      artista: "Jorge & Mateus",
+      frase: "Passa o dia, passa a noite — tô apaixonado.",
+    },
+    {
+      youtubeId: "ICS6uKC93w0",
+      titulo: "Os Anjos Cantam",
+      artista: "Jorge & Mateus",
+      frase: "E os anjos cantam o nosso amor.",
+    },
+  ],
 };

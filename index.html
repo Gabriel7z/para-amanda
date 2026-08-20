@@ -58,9 +58,9 @@
     <main id="site" class="site" hidden>
       <header class="topo">
         <p class="topo-marca">para <span data-campo="nomeDela">Amanda</span></p>
-        <button type="button" class="btn-musica" id="btnMusica" aria-label="Tocar Duas Metades">
+        <button type="button" class="btn-musica" id="btnMusica" aria-label="Tocar a música de hoje">
           <span class="musica-icone" aria-hidden="true">♪</span>
-          <span class="musica-texto">Duas Metades</span>
+          <span class="musica-texto" id="musicaBotaoTexto">Duas Metades</span>
         </button>
       </header>
 
@@ -191,13 +191,13 @@
       </section>
 
       <section class="secao musica-secao" id="musica">
-        <p class="secao-olho revelar">a nossa música</p>
+        <p class="secao-olho revelar">a música de hoje</p>
         <h2 class="secao-titulo revelar">
-          <span data-campo="musicaArtista">Jorge &amp; Mateus</span>
+          <span id="musicaArtista">Jorge &amp; Mateus</span>
           —
-          <span data-campo="musicaTitulo">Duas Metades</span>
+          <span id="musicaTitulo">Duas Metades</span>
         </h2>
-        <p class="secao-sub revelar">Porque a gente se completa.</p>
+        <p class="secao-sub revelar" id="musicaFrase">Porque a gente se completa.</p>
         <div class="player-moldura revelar" id="playerMoldura">
           <div id="ytplayer"></div>
         </div>
