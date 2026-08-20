@@ -136,13 +136,9 @@ Eu te amo, meu grande amor! 🥺❤️`,
       quando: "Abra no dia 22 de outubro",
       texto: `Meu amor,
 
-Hoje é o aniversário do dia em que eu te conheci. 22 de outubro de 2022. Eu ainda lembro daquela noite — oito da noite, o céu no mesmo lugar, e a minha vida mudando de cor sem eu perceber o tamanho do presente.
+Aqui vai ficar o recado deste dia. Eu ainda vou escrever as palavras certas para você.
 
-Eu não sabia que era você. Hoje eu sei. Amanda. A minha outra metade, a mulher que me levanta, a pessoa em quem eu confio.
-
-Obrigado por ter aparecido na minha vida. Obrigado por ter ficado. Eu te amo neste 22 de outubro, e em todos os que a gente ainda vai viver juntos.
-
-Eu te amo, meu grande amor.`,
+Eu te amo.`,
     },
     {
       id: "namoro",
@@ -152,13 +148,9 @@ Eu te amo, meu grande amor.`,
       quando: "Abra no dia 23 de agosto",
       texto: `Meu amor,
 
-23 de agosto. O dia do nosso sim. O dia em que a gente virou namoro — e o dia em que eu passei a cuidar de um “nós”.
+Aqui vai ficar o recado deste dia. Eu ainda vou escrever as palavras certas para você.
 
-Eu te escolho de novo. Hoje, amanhã, e em cada aniversário que ainda vamos comemorar. Você é a minha namorada, a minha noiva, a minha futura esposa, o meu porto seguro.
-
-Eu louvo a Deus por cada ano ao seu lado, por cada tijolinho que a gente colocou nessa vida. Feliz aniversário de namoro, meu grande amor.
-
-Eu te amo. E vou continuar te amando.`,
+Eu te amo.`,
     },
   ],
 
