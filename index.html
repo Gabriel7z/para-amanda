@@ -38,27 +38,27 @@
   <body>
     <canvas id="petalas" aria-hidden="true"></canvas>
 
+    <div id="amorQuem" class="amor-quem" hidden>
+      <div class="amor-quem-caixa">
+        <p class="secao-olho">a competição</p>
+        <h2>Quem está aí?</h2>
+        <p>A Amanda clica no retrato dela. O Gabriel clica no dele. Um te amo por dia — quem esquecer fica atrás.</p>
+        <div class="amor-quem-botoes">
+          <button type="button" class="amor-quem-btn" data-eu="amanda">Eu sou a Amanda</button>
+          <button type="button" class="amor-quem-btn" data-eu="gabriel">Eu sou o Gabriel</button>
+        </div>
+      </div>
+    </div>
+
     <div id="amorIntro" class="amor-intro" hidden>
       <div class="amor-intro-ceu"></div>
       <div class="amor-intro-caixa">
-        <p class="secao-olho">carregando</p>
-        <h2 class="amor-intro-titulo">O nosso amor</h2>
-        <div class="barra-amor" data-barra="intro">
-          <figure class="amor-avatar">
-            <img data-avatar="amanda" alt="Amanda" />
-            <figcaption>Amanda</figcaption>
-          </figure>
-          <div class="barra-amor-trilho" aria-hidden="true">
-            <div class="barra-amor-preenchimento" id="amorIntroFill"></div>
-            <span class="barra-amor-coracao">♥</span>
-          </div>
-          <figure class="amor-avatar">
-            <img class="amor-avatar-gabriel" data-avatar="gabriel" alt="Gabriel" />
-            <figcaption>Gabriel</figcaption>
-          </figure>
-        </div>
-        <p class="amor-pct" id="amorIntroPct">0%</p>
-        <p class="amor-intro-nota">infinito, e um pouco mais</p>
+        <p class="secao-olho">quem ama mais</p>
+        <h2 class="amor-intro-titulo">A barra do te amo</h2>
+        <p class="amor-intro-nota">Toque no seu retrato. Um clique por dia.</p>
+        <div class="barra-amor barra-amor-jogo" data-barra="intro"></div>
+        <p class="amor-placar" data-amor-placar>Toque no seu retrato para dizer te amo hoje.</p>
+        <button type="button" class="btn-rolar" id="amorIntroAbrir">Abrir a carta</button>
       </div>
     </div>
 
@@ -92,21 +92,8 @@
         <p class="hero-olho">uma homenagem para</p>
         <h1 class="hero-nome" data-campo="nomeDela">Amanda</h1>
         <p class="hero-titulo" data-campo="tituloHero">Você é a minha outra metade</p>
-        <div class="barra-amor barra-amor-hero" data-barra="hero">
-          <figure class="amor-avatar">
-            <img data-avatar="amanda" alt="Amanda" />
-            <figcaption>Amanda</figcaption>
-          </figure>
-          <div class="barra-amor-trilho" aria-hidden="true">
-            <div class="barra-amor-preenchimento" id="amorBarraFill"></div>
-            <span class="barra-amor-coracao">♥</span>
-          </div>
-          <figure class="amor-avatar">
-            <img class="amor-avatar-gabriel" data-avatar="gabriel" alt="Gabriel" />
-            <figcaption>Gabriel</figcaption>
-          </figure>
-        </div>
-        <p class="amor-pct amor-pct-hero" id="amorBarraPct">0%</p>
+        <div class="barra-amor barra-amor-jogo barra-amor-hero" data-barra="hero"></div>
+        <p class="amor-placar amor-placar-hero" data-amor-placar>Toque no seu retrato para dizer te amo hoje.</p>
         <div id="capaPolaroid" class="capa-polaroid"></div>
         <div class="marcos">
           <div class="marco">

@@ -229,7 +229,6 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
 
   fraseFinal: "Eu te amo, Amanda. E vou continuar te amando.",
 
-  // Fotos redondas da barra de amor (Amanda à esquerda, Gabriel à direita).
   avatarAmanda: "fotos/avatar-amanda.jpg",
   avatarGabriel: "fotos/avatar-gabriel.jpg",
 

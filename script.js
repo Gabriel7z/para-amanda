@@ -1043,47 +1043,282 @@
     });
   }
 
-  function animarBarra(fill, coracao, pct, aoTerminar) {
-    if (!fill) {
-      if (aoTerminar) aoTerminar();
-      return;
-    }
-    const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const duracao = reduzir ? 0 : 2400;
-    const inicio = performance.now();
+  const AMOR_GUARDA = "para-amanda-amor-v1";
+  const AMOR_API = "https://countapi.mileshilliard.com/api/v1";
+  const AMOR_CHAVES = {
+    amanda: "gabriel7z-para-amanda-amanda-te-ama-v1",
+    gabriel: "gabriel7z-para-amanda-gabriel-te-ama-v1",
+  };
 
-    function pintar(valor) {
-      const limitado = Math.min(100, Math.max(0, valor));
-      fill.style.width = limitado + "%";
-      if (coracao) coracao.style.left = limitado + "%";
-      if (pct) pct.textContent = valor >= 100 ? "∞" : Math.round(limitado) + "%";
-    }
+  const placarAmor = { amanda: 0, gabriel: 0 };
+  let clicandoAmor = false;
+  let esperaQuem = null;
 
-    if (duracao <= 0) {
-      pintar(100);
-      if (aoTerminar) aoTerminar();
-      return;
-    }
-
-    function passo(agora) {
-      const t = Math.min(1, (agora - inicio) / duracao);
-      const suave = 1 - Math.pow(1 - t, 3);
-      pintar(suave * 100);
-      if (t < 1) requestAnimationFrame(passo);
-      else if (aoTerminar) setTimeout(aoTerminar, 420);
-    }
-
-    requestAnimationFrame(passo);
+  function hojeBrasil() {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+    }).format(new Date());
   }
 
-  let barraHeroFeita = false;
-  function iniciarBarraAmorHero() {
-    if (barraHeroFeita) return;
-    barraHeroFeita = true;
-    const fill = $("#amorBarraFill");
-    const pct = $("#amorBarraPct");
-    const coracao = fill && fill.parentElement.querySelector(".barra-amor-coracao");
-    animarBarra(fill, coracao, pct);
+  function lerEu() {
+    try {
+      const q = new URLSearchParams(window.location.search).get("eu");
+      if (q === "amanda" || q === "gabriel") {
+        localStorage.setItem(AMOR_GUARDA + "-eu", q);
+        return q;
+      }
+      return localStorage.getItem(AMOR_GUARDA + "-eu");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function salvarEu(quem) {
+    try {
+      localStorage.setItem(AMOR_GUARDA + "-eu", quem);
+    } catch (e) {}
+  }
+
+  function jaClicouHoje(quem) {
+    try {
+      return localStorage.getItem(AMOR_GUARDA + "-dia-" + quem) === hojeBrasil();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function marcarCliqueHoje(quem) {
+    try {
+      localStorage.setItem(AMOR_GUARDA + "-dia-" + quem, hojeBrasil());
+    } catch (e) {}
+  }
+
+  function numeroApi(dado) {
+    const n = Number(dado && dado.value);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  async function lerPontos(lado) {
+    try {
+      const r = await fetch(AMOR_API + "/get/" + AMOR_CHAVES[lado]);
+      if (r.status === 404) return 0;
+      if (!r.ok) throw new Error("get");
+      return numeroApi(await r.json());
+    } catch (e) {
+      try {
+        return Number(localStorage.getItem(AMOR_GUARDA + "-" + lado) || 0);
+      } catch (err) {
+        return 0;
+      }
+    }
+  }
+
+  async function somarPonto(lado) {
+    const r = await fetch(AMOR_API + "/hit/" + AMOR_CHAVES[lado]);
+    if (!r.ok) throw new Error("hit");
+    const n = numeroApi(await r.json());
+    try {
+      localStorage.setItem(AMOR_GUARDA + "-" + lado, String(n));
+    } catch (e) {}
+    return n;
+  }
+
+  function textoPlacar() {
+    const a = placarAmor.amanda;
+    const g = placarAmor.gabriel;
+    const eu = lerEu();
+    if (a === 0 && g === 0) {
+      return "Toque no seu retrato. Um te amo por dia — quem esquecer fica atrás.";
+    }
+    if (a === g) {
+      return "Empate: " + a + " a " + g + ". Quem esquecer de clicar sai perdendo.";
+    }
+    if (a > g) {
+      return (
+        CONFIG.nomeDela +
+        " está na frente (" +
+        a +
+        " a " +
+        g +
+        "). " +
+        CONFIG.seuNome +
+        ", não esquece de clicar!"
+      );
+    }
+    return (
+      CONFIG.seuNome +
+      " está na frente (" +
+      g +
+      " a " +
+      a +
+      "). " +
+      CONFIG.nomeDela +
+      ", não esquece de clicar!"
+    );
+  }
+
+  function pintarJogoAmor() {
+    const a = placarAmor.amanda;
+    const g = placarAmor.gabriel;
+    const total = a + g;
+    const pct = total === 0 ? 50 : (a / total) * 100;
+    const eu = lerEu();
+    const frase = textoPlacar();
+    const extra =
+      eu && jaClicouHoje(eu) ? " Hoje você já disse te amo. Amanhã vale ponto de novo." : "";
+
+    $$(".barra-amor-jogo").forEach((barra) => {
+      const fill = barra.querySelector(".barra-amor-preenchimento");
+      const coracao = barra.querySelector(".barra-amor-coracao");
+      if (fill) fill.style.width = pct + "%";
+      if (coracao) coracao.style.left = pct + "%";
+      barra.querySelectorAll("[data-pts]").forEach((el) => {
+        el.textContent = placarAmor[el.dataset.pts] || 0;
+      });
+      barra.querySelectorAll(".amor-lado").forEach((btn) => {
+        const lado = btn.dataset.lado;
+        btn.classList.toggle("sou-eu", eu === lado);
+        btn.classList.toggle("na-frente", total > 0 && placarAmor[lado] > placarAmor[lado === "amanda" ? "gabriel" : "amanda"]);
+      });
+    });
+
+    $$("[data-amor-placar]").forEach((el) => {
+      el.textContent = frase + extra;
+    });
+  }
+
+  function montarBarrasAmor() {
+    const amanda = CONFIG.avatarAmanda || "";
+    const gabriel = CONFIG.avatarGabriel || "";
+    $$(".barra-amor-jogo").forEach((barra) => {
+      if (barra.dataset.pronta === "1") return;
+      barra.dataset.pronta = "1";
+      barra.innerHTML =
+        '<button type="button" class="amor-lado" data-lado="amanda" aria-label="Amanda: eu te amo">' +
+        '<img data-avatar="amanda" alt="" />' +
+        '<span class="amor-lado-nome"></span>' +
+        '<span class="amor-lado-pts" data-pts="amanda">0</span>' +
+        '<span class="amor-lado-acao">eu te amo</span>' +
+        "</button>" +
+        '<div class="barra-amor-trilho" aria-hidden="true">' +
+        '<div class="barra-amor-preenchimento"></div>' +
+        '<span class="barra-amor-coracao">♥</span>' +
+        "</div>" +
+        '<button type="button" class="amor-lado" data-lado="gabriel" aria-label="Gabriel: eu te amo">' +
+        '<img class="amor-avatar-gabriel" data-avatar="gabriel" alt="" />' +
+        '<span class="amor-lado-nome"></span>' +
+        '<span class="amor-lado-pts" data-pts="gabriel">0</span>' +
+        '<span class="amor-lado-acao">eu te amo</span>' +
+        "</button>";
+      const nomes = barra.querySelectorAll(".amor-lado-nome");
+      nomes[0].textContent = CONFIG.nomeDela;
+      nomes[1].textContent = CONFIG.seuNome;
+      const imgs = barra.querySelectorAll("img");
+      if (amanda) imgs[0].src = amanda;
+      if (gabriel) imgs[1].src = gabriel;
+      imgs[0].alt = CONFIG.nomeDela;
+      imgs[1].alt = CONFIG.seuNome;
+    });
+  }
+
+  function pedirQuemSou(depois) {
+    const modal = $("#amorQuem");
+    if (!modal) {
+      if (depois) depois(null);
+      return;
+    }
+    esperaQuem = depois || null;
+    modal.hidden = false;
+  }
+
+  function fecharQuem(quem) {
+    const modal = $("#amorQuem");
+    if (modal) modal.hidden = true;
+    const cb = esperaQuem;
+    esperaQuem = null;
+    if (cb) cb(quem);
+  }
+
+  async function atualizarPlacarRemoto() {
+    const [a, g] = await Promise.all([lerPontos("amanda"), lerPontos("gabriel")]);
+    placarAmor.amanda = a;
+    placarAmor.gabriel = g;
+    pintarJogoAmor();
+  }
+
+  async function clicarLado(lado, origem) {
+    if (clicandoAmor) return;
+    let eu = lerEu();
+    if (!eu) {
+      pedirQuemSou((quem) => {
+        if (quem) clicarLado(lado, origem);
+      });
+      return;
+    }
+    if (lado !== eu) {
+      $$("[data-amor-placar]").forEach((el) => {
+        el.textContent =
+          eu === "amanda"
+            ? "Essa é a parte do " + CONFIG.seuNome + ". Clica no seu retrato."
+            : "Essa é a parte da " + CONFIG.nomeDela + ". Clica no seu retrato.";
+      });
+      return;
+    }
+    if (jaClicouHoje(eu)) {
+      pintarJogoAmor();
+      return;
+    }
+    clicandoAmor = true;
+    try {
+      placarAmor[eu] = await somarPonto(eu);
+      marcarCliqueHoje(eu);
+      pintarJogoAmor();
+      if (origem && origem.getBoundingClientRect) {
+        const r = origem.getBoundingClientRect();
+        soltarCoracao(r.left + r.width / 2, r.top + 12);
+      }
+      chuvaDeCoracoes();
+    } catch (e) {
+      try {
+        const local = Number(localStorage.getItem(AMOR_GUARDA + "-" + eu) || 0) + 1;
+        localStorage.setItem(AMOR_GUARDA + "-" + eu, String(local));
+        placarAmor[eu] = local;
+        marcarCliqueHoje(eu);
+        pintarJogoAmor();
+      } catch (err) {}
+    }
+    clicandoAmor = false;
+  }
+
+  function iniciarJogoAmor() {
+    montarBarrasAmor();
+    aplicarAvatares();
+    pintarJogoAmor();
+    atualizarPlacarRemoto();
+
+    $$(".barra-amor-jogo").forEach((barra) => {
+      barra.addEventListener("click", (e) => {
+        const btn = e.target.closest(".amor-lado");
+        if (!btn) return;
+        clicarLado(btn.dataset.lado, btn);
+      });
+    });
+
+    const modal = $("#amorQuem");
+    if (modal) {
+      modal.querySelectorAll("[data-eu]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          salvarEu(btn.dataset.eu);
+          fecharQuem(btn.dataset.eu);
+          pintarJogoAmor();
+        });
+      });
+    }
+
+    setInterval(atualizarPlacarRemoto, 20000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") atualizarPlacarRemoto();
+    });
   }
 
   function iniciarIntroAmor(depois) {
@@ -1093,15 +1328,17 @@
       return;
     }
     intro.hidden = false;
-    const fill = $("#amorIntroFill");
-    const pct = $("#amorIntroPct");
-    const coracao = fill && fill.parentElement.querySelector(".barra-amor-coracao");
-    animarBarra(fill, coracao, pct, () => {
+    const abrir = $("#amorIntroAbrir");
+    if (!abrir) {
+      if (depois) depois();
+      return;
+    }
+    abrir.addEventListener("click", () => {
       intro.classList.add("saida");
       setTimeout(() => {
         intro.remove();
         if (depois) depois();
-      }, 800);
+      }, 700);
     });
   }
 
@@ -1115,7 +1352,6 @@
       site.hidden = false;
       if (tocarMusica) tocarMusica();
       envelope.classList.add("aberto");
-      iniciarBarraAmorHero();
       setTimeout(() => {
         capa.classList.add("saida");
         site.classList.add("visivel");
@@ -1153,13 +1389,14 @@
   montarPromessas();
   iniciarContadores();
   petalas();
+  iniciarJogoAmor();
   iniciarIntroAmor(abrirCarta);
 
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        ".capa, .amor-intro, .barra-amor, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
+        ".capa, .amor-intro, .amor-quem, .barra-amor, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
       )
     ) {
       return;
