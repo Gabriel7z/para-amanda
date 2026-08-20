@@ -198,6 +198,8 @@ Eu louvo a Deus por cada dia bom que a vida te dá, e por poder ver de pertinho.
     },
     {
       quando: "Abra antes de dormir",
+      // Teste: fogos neste bilhete para ver o efeito. Tirar depois.
+      testeFogos: true,
       texto: `Boa noite, meu amor.
 
 Se você chegou até aqui hoje, já deu tudo certo — já é motivo de agradecer.
