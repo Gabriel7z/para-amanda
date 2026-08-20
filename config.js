@@ -234,6 +234,8 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
 
   // Clipes oficiais no YouTube. Não hospedamos o áudio.
   // Rodízio: uma música por dia, na ordem abaixo, e depois recomeça.
+  // A troca é todo dia neste horário (Brasília), não à meia-noite.
+  horaTrocaMusica: 20,
   musicas: [
     {
       youtubeId: "HR4ZxjGQGYY",

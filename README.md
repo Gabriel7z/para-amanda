@@ -17,6 +17,6 @@ Este é o **único** repositório do site: [Gabriel7z/para-amanda](https://githu
 - Namoro desde **23 de agosto de 2023**
 - Barra de amor em disputa: cada um puxa o coração para o outro
 - Calendário de carinho: cada visita acende o coração do dia
-- Música: rodízio de três clipes oficiais, um por dia — Jorge & Mateus, Henrique & Juliano, Leandro & Leonardo
+- Música: rodízio de três clipes oficiais, um por dia, com troca às **20h** (Brasília) — Jorge & Mateus, Henrique & Juliano, Leandro & Leonardo
 
 Sem foto, o polaroid mostra um coração. Nada quebra.

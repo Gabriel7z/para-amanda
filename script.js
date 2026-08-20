@@ -885,6 +885,66 @@
     }
   }
 
+  function partesBrasil(date) {
+    const fmt = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    });
+    const map = {};
+    fmt.formatToParts(date || new Date()).forEach((p) => {
+      if (p.type !== "literal") map[p.type] = p.value;
+    });
+    return {
+      ano: Number(map.year),
+      mes: Number(map.month),
+      dia: Number(map.day),
+      hora: Number(map.hour),
+      minuto: Number(map.minute),
+      segundo: Number(map.second),
+    };
+  }
+
+  function horaTrocaMusica() {
+    const n = Number(CONFIG.horaTrocaMusica);
+    return Number.isFinite(n) ? n : 20;
+  }
+
+  function instanteLocalBrasilParaMs(ano, mes, dia, hora, min, sec) {
+    const wanted = Date.UTC(ano, mes - 1, dia, hora, min || 0, sec || 0);
+    const visto = partesBrasil(new Date(wanted));
+    const atual = Date.UTC(
+      visto.ano,
+      visto.mes - 1,
+      visto.dia,
+      visto.hora,
+      visto.minuto,
+      visto.segundo
+    );
+    return wanted + (wanted - atual);
+  }
+
+  function msAteProximaTrocaMusica() {
+    const hora = horaTrocaMusica();
+    const b = partesBrasil();
+    let ano = b.ano;
+    let mes = b.mes;
+    let dia = b.dia;
+    if (b.hora >= hora) {
+      const amanha = new Date(Date.UTC(ano, mes - 1, dia + 1));
+      ano = amanha.getUTCFullYear();
+      mes = amanha.getUTCMonth() + 1;
+      dia = amanha.getUTCDate();
+    }
+    const alvo = instanteLocalBrasilParaMs(ano, mes, dia, hora, 0, 0);
+    return Math.max(1500, alvo - Date.now() + 400);
+  }
+
   function musicaDoDia() {
     const lista =
       CONFIG.musicas && CONFIG.musicas.length
@@ -899,14 +959,10 @@
           ];
     const validas = lista.filter((item) => item && item.youtubeId);
     if (!validas.length) return null;
-    const txt = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Sao_Paulo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    const partes = txt.split("-").map(Number);
-    const dias = Math.floor(Date.UTC(partes[0], partes[1] - 1, partes[2]) / 86400000);
+    const b = partesBrasil();
+    let utc = Date.UTC(b.ano, b.mes - 1, b.dia);
+    if (b.hora < horaTrocaMusica()) utc -= 86400000;
+    const dias = Math.floor(utc / 86400000);
     return validas[((dias % validas.length) + validas.length) % validas.length];
   }
 
@@ -926,9 +982,9 @@
 
   function musica() {
     const btn = $("#btnMusica");
-    const hoje = musicaDoDia();
-    aplicarMusicaDoDia(hoje);
-    if (!hoje || !hoje.youtubeId) {
+    let atual = musicaDoDia();
+    aplicarMusicaDoDia(atual);
+    if (!atual || !atual.youtubeId) {
       btn.hidden = true;
       return;
     }
@@ -952,20 +1008,57 @@
       btn.classList.toggle("tocando", estadoTocando());
     }
 
+    function mesmaMusica(a, b) {
+      return (
+        a &&
+        b &&
+        a.youtubeId === b.youtubeId &&
+        (a.inicio || 0) === (b.inicio || 0)
+      );
+    }
+
+    function carregarMusica(nova) {
+      if (!nova || !nova.youtubeId || !player || !pronto) return;
+      const opts = {
+        videoId: nova.youtubeId,
+        startSeconds: nova.inicio || 0,
+      };
+      try {
+        if (querTocar) player.loadVideoById(opts);
+        else player.cueVideoById(opts);
+      } catch (err) {}
+    }
+
+    function trocarSeMudou() {
+      const nova = musicaDoDia();
+      if (!nova) return;
+      const mudou = !mesmaMusica(atual, nova);
+      atual = nova;
+      aplicarMusicaDoDia(nova);
+      if (mudou) carregarMusica(nova);
+    }
+
+    function agendarProximaTroca() {
+      window.setTimeout(() => {
+        trocarSeMudou();
+        agendarProximaTroca();
+      }, msAteProximaTrocaMusica());
+    }
+
     const criarPlayer = function () {
       if (player || !document.getElementById("ytplayer") || !(window.YT && YT.Player)) return;
       player = new YT.Player("ytplayer", {
         width: "100%",
         height: "100%",
-        videoId: hoje.youtubeId,
+        videoId: atual.youtubeId,
         playerVars: {
           autoplay: querTocar ? 1 : 0,
           rel: 0,
           modestbranding: 1,
           playsinline: 1,
           loop: 1,
-          playlist: hoje.youtubeId,
-          start: hoje.inicio || 0,
+          playlist: atual.youtubeId,
+          start: atual.inicio || 0,
           origin: window.location.origin,
           enablejsapi: 1,
         },
@@ -987,6 +1080,7 @@
               } catch (err) {}
             }
             atualizarBotao();
+            trocarSeMudou();
           },
           onStateChange: function (e) {
             atualizarBotao();
@@ -997,7 +1091,7 @@
               e.data === YT.PlayerState.ENDED
             ) {
               try {
-                player.seekTo(hoje.inicio || 0, true);
+                player.seekTo(atual.inicio || 0, true);
                 player.playVideo();
               } catch (err) {}
             }
@@ -1049,6 +1143,10 @@
       if (estadoTocando()) pausar();
       else tocar();
     });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") trocarSeMudou();
+    });
+    agendarProximaTroca();
 
     return tocar;
   }
