@@ -636,7 +636,6 @@
       const abrir = botao.querySelector(".bilhete-abrir");
       if (abrir) abrir.textContent = "ler de novo";
     }
-    if (bilhete.testeFogos) soltarFogos();
   }
 
   function mostrarAvisoAniv(texto, id) {
