@@ -1072,7 +1072,7 @@
       if (total === 0 || g === a) {
         pct.textContent = "50%";
         frase.textContent =
-          "Empate. Toque no seu retrato: você puxa o coração até ela, ela puxa até você.";
+          "Empate. Você toca no seu retrato, ela no dela — os dois celulares atualizam juntos.";
       } else if (g > a) {
         pct.textContent = Math.round(pctDele) + "%";
         frase.textContent =
@@ -1129,6 +1129,7 @@
     mandandoAmor = false;
     pintarBarraAmor();
     if (pendentesAmor.gabriel > 0 || pendentesAmor.amanda > 0) enviarAmorPendente();
+    else atualizarAmorRemoto();
   }
 
   function clicarLado(lado, evento) {
@@ -1166,7 +1167,7 @@
       const meio = caixa.left + caixa.width / 2;
       clicarLado(e.clientX < meio ? "gabriel" : "amanda", e);
     });
-    setInterval(atualizarAmorRemoto, 8000);
+    setInterval(atualizarAmorRemoto, 2000);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") atualizarAmorRemoto();
     });

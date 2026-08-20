@@ -8,7 +8,7 @@ Este é o **único** repositório do site: [Gabriel7z/para-amanda](https://githu
 
 **https://gabriel7z.github.io/para-amanda/?amor**
 
-É **um link só**. Dentro do site a barra é uma disputa: você toca no seu retrato e o coração vai até ela; ela toca no dela e o coração volta até você. Quem clicar mais, ama mais.
+É **um link só**. Ela abre no celular dela, você no seu. Cada um toca no próprio retrato e o placar atualiza nos dois.
 
 ## O que já está no site
 
