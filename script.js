@@ -650,7 +650,6 @@
     const anuncio = $("#anuncioAniversario");
     if (!anuncio) return;
     anuncio.hidden = true;
-    document.body.classList.remove("anuncio-aberto");
     const aviso = $("#anuncioAnivAviso");
     if (aviso) {
       aviso.hidden = true;
@@ -737,7 +736,6 @@
     grade.textContent = "";
     anivPorProximidade().forEach((item) => grade.appendChild(criarCartaoAniv(item)));
     anuncio.hidden = false;
-    document.body.classList.add("anuncio-aberto");
   }
 
   function soltarFogos() {
@@ -913,17 +911,8 @@
       if (!modal.hidden && e.key === "Escape") fechar();
     });
 
-    const anuncio = $("#anuncioAniversario");
     const depois = $("#anuncioAnivDepois");
     if (depois) depois.addEventListener("click", fecharAnuncioAniv);
-    if (anuncio) {
-      anuncio.addEventListener("click", (e) => {
-        if (e.target === anuncio) fecharAnuncioAniv();
-      });
-      document.addEventListener("keydown", (e) => {
-        if (!anuncio.hidden && e.key === "Escape") fecharAnuncioAniv();
-      });
-    }
   }
 
   function iniciarCinema() {
@@ -1125,6 +1114,7 @@
     if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
+    canvas.style.pointerEvents = "none";
     const ctx = canvas.getContext("2d");
     let w = 0;
     let h = 0;
