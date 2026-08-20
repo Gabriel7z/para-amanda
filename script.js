@@ -2,6 +2,34 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
+  function ehCelular() {
+    return window.matchMedia("(max-width: 800px), (pointer: coarse)").matches;
+  }
+
+  let travaRolagem = 0;
+  let rolagemSalva = 0;
+  let fundoPausadoAte = 0;
+
+  function pausarFundo(ms) {
+    fundoPausadoAte = Math.max(fundoPausadoAte, performance.now() + (ms || 0));
+  }
+
+  function travarTela() {
+    travaRolagem += 1;
+    if (travaRolagem !== 1) return;
+    rolagemSalva = window.scrollY || window.pageYOffset || 0;
+    document.body.style.top = "-" + rolagemSalva + "px";
+    document.body.classList.add("tela-travada");
+  }
+
+  function soltarTela() {
+    travaRolagem = Math.max(0, travaRolagem - 1);
+    if (travaRolagem !== 0) return;
+    document.body.classList.remove("tela-travada");
+    document.body.style.top = "";
+    window.scrollTo(0, rolagemSalva);
+  }
+
   function aplicarTextos() {
     $$("[data-campo]").forEach((el) => {
       const chave = el.dataset.campo;
@@ -472,11 +500,13 @@
       cap.textContent = foto.legenda;
       caixa.hidden = false;
       document.body.classList.add("lightbox-aberto");
+      travarTela();
     }
 
     function fechar() {
       caixa.hidden = true;
       document.body.classList.remove("lightbox-aberto");
+      soltarTela();
     }
 
     window.abrirFoto = mostrar;
@@ -608,7 +638,7 @@
       : "Você pode abrir daqui " + horas + " horas.";
   }
 
-  function preencherPapelBilhete(bilhete) {
+  function preencherPapelBilhete(bilhete, opts) {
     const modal = $("#bilheteModal");
     if (!bilhete || !modal) return false;
     $("#bilheteQuando").textContent = bilhete.titulo || bilhete.quando || "";
@@ -624,6 +654,7 @@
       });
     modal.hidden = false;
     document.body.classList.add("bilhete-aberto");
+    if (!(opts && opts.jaTravado)) travarTela();
     return true;
   }
 
@@ -646,11 +677,12 @@
     if (id) aviso.dataset.anivAviso = id;
   }
 
-  function fecharAnuncioAniv() {
+  function fecharAnuncioAniv(manterTrava) {
     const anuncio = $("#anuncioAniversario");
     if (!anuncio) return;
     anuncio.hidden = true;
     document.body.classList.remove("anuncio-aberto");
+    if (!manterTrava) soltarTela();
     const aviso = $("#anuncioAnivAviso");
     if (aviso) {
       aviso.hidden = true;
@@ -687,8 +719,10 @@
       return;
     }
     const primeira = !anivJaAberto(item.id);
-    fecharAnuncioAniv();
-    if (!preencherPapelBilhete(item)) return;
+    const anuncio = $("#anuncioAniversario");
+    const veioDoAnuncio = anuncio && !anuncio.hidden;
+    fecharAnuncioAniv(veioDoAnuncio);
+    if (!preencherPapelBilhete(item, { jaTravado: veioDoAnuncio })) return;
     marcarAniv(item.id);
     $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
     if (primeira) soltarFogos();
@@ -738,6 +772,7 @@
     anivPorProximidade().forEach((item) => grade.appendChild(criarCartaoAniv(item)));
     anuncio.hidden = false;
     document.body.classList.add("anuncio-aberto");
+    travarTela();
   }
 
   function soltarFogos() {
@@ -748,70 +783,64 @@
       return;
     }
 
+    const celular = ehCelular();
+    pausarFundo(7000);
     canvas.hidden = false;
     const ctx = canvas.getContext("2d");
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let w = 0;
-    let h = 0;
-    const foguetes = [];
-    const faíscas = [];
-    const cores = ["#fff6ea", "#d4b483", "#e8b4c4", "#c45c74", "#ffd166", "#ff6b8a", "#ffe8a3"];
+    const dpr = Math.min(window.devicePixelRatio || 1, celular ? 1.25 : 1.5);
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    function resize() {
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+    const foguetes = [];
+    const faiscas = [];
+    const cores = ["#fff6ea", "#d4b483", "#e8b4c4", "#c45c74", "#ffd166", "#ff6b8a"];
+    const porEstouro = celular ? 28 : 48;
+    const maxLanc = celular ? 5 : 8;
 
     function lancar() {
-      const alvoY = h * (0.16 + Math.random() * 0.28);
       foguetes.push({
-        x: w * (0.12 + Math.random() * 0.76),
+        x: w * (0.18 + Math.random() * 0.64),
         y: h + 8,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: -(6.2 + Math.random() * 3.4),
-        alvoY: alvoY,
+        vx: (Math.random() - 0.5) * 0.9,
+        vy: -(5.4 + Math.random() * 2.4),
+        alvoY: h * (0.22 + Math.random() * 0.22),
         cor: cores[(Math.random() * cores.length) | 0],
         vivo: true,
       });
     }
 
     function estourar(f) {
-      const n = 52 + ((Math.random() * 28) | 0);
-      for (let i = 0; i < n; i += 1) {
-        const ang = (Math.PI * 2 * i) / n + Math.random() * 0.15;
-        const vel = 1.3 + Math.random() * 3.8;
-        faíscas.push({
+      for (let i = 0; i < porEstouro; i += 1) {
+        const ang = (Math.PI * 2 * i) / porEstouro;
+        const vel = 1.1 + Math.random() * 2.6;
+        faiscas.push({
           x: f.x,
           y: f.y,
           vx: Math.cos(ang) * vel,
           vy: Math.sin(ang) * vel,
           vida: 1,
-          dec: 0.01 + Math.random() * 0.012,
-          r: 1.5 + Math.random() * 2.4,
-          cor: Math.random() > 0.22 ? f.cor : cores[(Math.random() * cores.length) | 0],
-          coracao: Math.random() > 0.84,
+          dec: 0.016 + Math.random() * 0.01,
+          r: celular ? 2.2 : 2.6,
+          cor: f.cor,
         });
       }
     }
 
-    resize();
-    window.addEventListener("resize", resize);
     let lancamentos = 0;
     lancar();
     const timer = window.setInterval(() => {
-      if (lancamentos < 9) {
+      if (lancamentos < maxLanc) {
         lancar();
-        if (Math.random() > 0.45) lancar();
         lancamentos += 1;
       } else {
         window.clearInterval(timer);
       }
-    }, 360);
+    }, celular ? 480 : 380);
 
     const inicio = performance.now();
     let quadro = 0;
@@ -821,45 +850,39 @@
         if (!f.vivo) return;
         f.x += f.vx;
         f.y += f.vy;
-        f.vy += 0.055;
+        f.vy += 0.05;
         ctx.fillStyle = f.cor;
         ctx.beginPath();
-        ctx.arc(f.x, f.y, 2.5, 0, Math.PI * 2);
+        ctx.arc(f.x, f.y, 3, 0, Math.PI * 2);
         ctx.fill();
-        if (f.vy >= -0.4 || f.y <= f.alvoY) {
+        if (f.vy >= -0.35 || f.y <= f.alvoY) {
           f.vivo = false;
           estourar(f);
         }
       });
-      for (let i = faíscas.length - 1; i >= 0; i -= 1) {
-        const p = faíscas[i];
+      for (let i = faiscas.length - 1; i >= 0; i -= 1) {
+        const p = faiscas[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.032;
-        p.vx *= 0.992;
+        p.vy += 0.03;
+        p.vx *= 0.99;
         p.vida -= p.dec;
         if (p.vida <= 0) {
-          faíscas.splice(i, 1);
+          faiscas.splice(i, 1);
           continue;
         }
         ctx.globalAlpha = Math.max(0, p.vida);
         ctx.fillStyle = p.cor;
-        if (p.coracao) {
-          ctx.font = 9 + p.r * 2 + "px serif";
-          ctx.fillText("♥", p.x, p.y);
-        } else {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
         ctx.globalAlpha = 1;
       }
       const acabou =
-        t - inicio > 6800 &&
+        t - inicio > 5600 &&
         foguetes.every((f) => !f.vivo) &&
-        faíscas.length === 0;
+        faiscas.length === 0;
       if (acabou) {
-        window.removeEventListener("resize", resize);
         ctx.clearRect(0, 0, w, h);
         canvas.hidden = true;
         return;
@@ -867,13 +890,6 @@
       quadro = window.requestAnimationFrame(frame);
     }
     quadro = window.requestAnimationFrame(frame);
-    return function parar() {
-      window.cancelAnimationFrame(quadro);
-      window.clearInterval(timer);
-      window.removeEventListener("resize", resize);
-      ctx.clearRect(0, 0, w, h);
-      canvas.hidden = true;
-    };
   }
 
   function montarBilhetes() {
@@ -913,7 +929,7 @@
     }
 
     secao.hidden = false;
-    window.setInterval(atualizarEsperasAniv, 1000);
+    window.setInterval(atualizarEsperasAniv, 8000);
   }
 
   function iniciarBilhetes() {
@@ -923,6 +939,7 @@
     function fechar() {
       modal.hidden = true;
       document.body.classList.remove("bilhete-aberto");
+      soltarTela();
     }
 
     $("#bilheteFechar").addEventListener("click", fechar);
@@ -1029,6 +1046,7 @@
     function abrir() {
       caixa.hidden = false;
       document.body.classList.add("cinema-aberto");
+      travarTela();
       comecar();
       if (tocarMusica) tocarMusica();
     }
@@ -1037,6 +1055,7 @@
       clearTimeout(timer);
       caixa.hidden = true;
       document.body.classList.remove("cinema-aberto");
+      soltarTela();
     }
 
     function alternarPausa() {
@@ -1145,55 +1164,93 @@
     if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
+    const celular = ehCelular();
     let w = 0;
     let h = 0;
+    let ultimoW = 0;
+    let ultimoH = 0;
+    let ultimoQuadro = 0;
     const flakes = [];
+    const qtd = celular ? 10 : 22;
+    const dpr = Math.min(window.devicePixelRatio || 1, celular ? 1.25 : 1.5);
 
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
+    function resize(forcar) {
+      const nw = window.innerWidth;
+      const nh = window.innerHeight;
+      if (
+        !forcar &&
+        Math.abs(nw - ultimoW) < 8 &&
+        Math.abs(nh - ultimoH) < 140
+      ) {
+        return;
+      }
+      ultimoW = nw;
+      ultimoH = nh;
+      w = nw;
+      h = nh;
+      canvas.width = Math.round(nw * dpr);
+      canvas.height = Math.round(nh * dpr);
+      canvas.style.width = nw + "px";
+      canvas.style.height = nh + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function criar(qtd) {
+    function criar() {
+      flakes.length = 0;
       for (let i = 0; i < qtd; i += 1) {
         flakes.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: 4 + Math.random() * 7,
-          s: 0.4 + Math.random() * 0.9,
+          x: Math.random() * Math.max(w, 1),
+          y: Math.random() * Math.max(h, 1),
+          r: celular ? 3 + Math.random() * 4 : 4 + Math.random() * 6,
+          s: 0.25 + Math.random() * 0.45,
           a: Math.random() * Math.PI * 2,
-          cor: Math.random() > 0.5 ? "rgba(232,180,196,0.7)" : "rgba(196,92,116,0.55)",
+          cor: Math.random() > 0.5 ? "rgba(232,180,196,0.45)" : "rgba(196,92,116,0.32)",
         });
       }
     }
 
-    function desenhar() {
+    function desenhar(t) {
+      if (document.hidden || t < fundoPausadoAte) {
+        requestAnimationFrame(desenhar);
+        return;
+      }
+      if (celular && t - ultimoQuadro < 40) {
+        requestAnimationFrame(desenhar);
+        return;
+      }
+      ultimoQuadro = t;
       ctx.clearRect(0, 0, w, h);
-      flakes.forEach((p) => {
+      for (let i = 0; i < flakes.length; i += 1) {
+        const p = flakes[i];
         p.y += p.s;
-        p.x += Math.sin(p.a) * 0.6;
-        p.a += 0.01;
-        if (p.y > h + 10) {
-          p.y = -10;
+        p.x += Math.sin(p.a) * 0.35;
+        p.a += 0.008;
+        if (p.y > h + 12) {
+          p.y = -12;
           p.x = Math.random() * w;
         }
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.a);
         ctx.fillStyle = p.cor;
         ctx.beginPath();
-        ctx.ellipse(0, 0, p.r, p.r * 0.6, 0, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
-      });
+      }
       requestAnimationFrame(desenhar);
     }
 
-    resize();
-    criar(28);
-    window.addEventListener("resize", resize);
-    desenhar();
+    resize(true);
+    criar();
+    window.addEventListener(
+      "resize",
+      function () {
+        resize(false);
+      },
+      { passive: true }
+    );
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) ctx.clearRect(0, 0, w, h);
+    });
+    requestAnimationFrame(desenhar);
   }
 
   function soltarCoracao(x, y) {
@@ -1208,14 +1265,14 @@
   }
 
   function chuvaDeCoracoes() {
-    const total = 28;
+    const total = ehCelular() ? 12 : 28;
     for (let i = 0; i < total; i += 1) {
       setTimeout(() => {
         soltarCoracao(
           Math.random() * window.innerWidth,
           window.innerHeight - 40 - Math.random() * 80
         );
-      }, i * 50);
+      }, i * 70);
     }
   }
 
@@ -1891,8 +1948,17 @@
   iniciarCalendario();
   abrirCarta();
 
+  window.addEventListener(
+    "scroll",
+    function () {
+      pausarFundo(320);
+    },
+    { passive: true }
+  );
+
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
+    if (ehCelular()) return;
     if (
       e.target.closest(
         ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .anuncio-aniv, .roleta-cena, .ceu-moldura"
