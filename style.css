@@ -508,6 +508,116 @@ code {
   color: #6d4c59;
 }
 
+/* ---------- Calendário de carinho ---------- */
+
+.calendario {
+  width: min(420px, 100%);
+  margin: 0 auto;
+  background: var(--papel);
+  border: 1px solid rgba(212, 180, 131, 0.5);
+  border-radius: 24px;
+  padding: 1.3rem 1.2rem 1.2rem;
+  box-shadow: 0 20px 44px rgba(59, 16, 32, 0.14);
+}
+
+.cal-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.cal-topo h3 {
+  font-family: var(--fonte-titulo);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--vinho);
+  text-transform: capitalize;
+}
+
+.cal-nav {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ouro);
+  background: var(--creme);
+  color: var(--vinho);
+  border-radius: 50%;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cal-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.cal-semana,
+.cal-grade {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.cal-semana {
+  margin-bottom: 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a6573;
+}
+
+.cal-dia {
+  aspect-ratio: 1;
+  border: 0;
+  background: transparent;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  padding: 0 0 0.85rem;
+  color: #d4b8c0;
+  font-size: 1.2rem;
+  line-height: 1;
+  position: relative;
+}
+
+.cal-dia span {
+  position: absolute;
+  bottom: 2px;
+  font-size: 0.58rem;
+  letter-spacing: 0;
+  color: #8a6573;
+  font-family: var(--fonte-texto);
+}
+
+.cal-dia.vazio {
+  visibility: hidden;
+}
+
+.cal-dia.aceso {
+  color: #e07086;
+  text-shadow: 0 0 12px rgba(224, 112, 134, 0.65);
+}
+
+.cal-dia.hoje {
+  box-shadow: inset 0 0 0 2px var(--ouro);
+}
+
+.cal-dia.futuro {
+  opacity: 0.28;
+}
+
+.cal-legenda {
+  margin-top: 0.95rem;
+  text-align: center;
+  font-family: var(--fonte-titulo);
+  font-style: italic;
+  color: var(--vinho-medio);
+  font-size: 1.05rem;
+}
+
 .player-moldura {
   position: relative;
   width: min(720px, 100%);

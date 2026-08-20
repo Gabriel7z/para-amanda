@@ -1173,6 +1173,197 @@
     });
   }
 
+  function iniciarCalendario() {
+    const MESES = [
+      "janeiro",
+      "fevereiro",
+      "março",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro",
+    ];
+    const GUARDA = "para-amanda-cal-";
+    const API = "https://countapi.mileshilliard.com/api/v1";
+    const CHAVE = "gabriel7z-para-amanda-cal-";
+    const mascaras = {};
+    const hoje = dataBrasil();
+    let vista = { ano: hoje.ano, mes: hoje.mes };
+    const inicio = (CONFIG.dataConheceu || "2022-10-22").split("-").map(Number);
+    const minAno = inicio[0];
+    const minMes = inicio[1];
+
+    function dataBrasil() {
+      const txt = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+      const partes = txt.split("-").map(Number);
+      return { ano: partes[0], mes: partes[1], dia: partes[2] };
+    }
+
+    function chaveMes(ano, mes) {
+      return String(ano) + String(mes).padStart(2, "0");
+    }
+
+    function bitDoDia(dia) {
+      return 1 << (dia - 1);
+    }
+
+    function temDia(mask, dia) {
+      return (mask & bitDoDia(dia)) !== 0;
+    }
+
+    function diasNoMes(ano, mes) {
+      return new Date(ano, mes, 0).getDate();
+    }
+
+    function lerLocal(ano, mes) {
+      try {
+        return Number(localStorage.getItem(GUARDA + chaveMes(ano, mes)) || 0) >>> 0;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function salvarLocal(ano, mes, mask) {
+      try {
+        localStorage.setItem(GUARDA + chaveMes(ano, mes), String(mask >>> 0));
+      } catch (e) {}
+    }
+
+    async function lerRemoto(ano, mes) {
+      try {
+        const r = await fetch(API + "/get/" + CHAVE + chaveMes(ano, mes));
+        if (r.status === 404) return 0;
+        if (!r.ok) throw new Error("get");
+        return Number((await r.json()).value || 0) >>> 0;
+      } catch (e) {
+        return lerLocal(ano, mes);
+      }
+    }
+
+    async function salvarRemoto(ano, mes, mask) {
+      try {
+        await fetch(API + "/set/" + CHAVE + chaveMes(ano, mes) + "?value=" + (mask >>> 0));
+      } catch (e) {}
+    }
+
+    async function mascaraDoMes(ano, mes) {
+      const id = chaveMes(ano, mes);
+      const local = lerLocal(ano, mes);
+      const remoto = await lerRemoto(ano, mes);
+      const junta = (local | remoto) >>> 0;
+      mascaras[id] = junta;
+      if (junta !== local) salvarLocal(ano, mes, junta);
+      return junta;
+    }
+
+    function pintar() {
+      const grade = $("#calGrade");
+      const titulo = $("#calMes");
+      const legenda = $("#calLegenda");
+      const ant = $("#calAnt");
+      const prox = $("#calProx");
+      if (!grade || !titulo) return;
+      const { ano, mes } = vista;
+      const id = chaveMes(ano, mes);
+      const mask = mascaras[id] || lerLocal(ano, mes);
+      const totalDias = diasNoMes(ano, mes);
+      const primeiro = new Date(ano, mes - 1, 1).getDay();
+      const ehAtual = ano === hoje.ano && mes === hoje.mes;
+      titulo.textContent = MESES[mes - 1] + " " + ano;
+      if (ant) {
+        ant.disabled = ano < minAno || (ano === minAno && mes <= minMes);
+      }
+      if (prox) {
+        prox.disabled = ano > hoje.ano || (ano === hoje.ano && mes >= hoje.mes);
+      }
+      grade.innerHTML = "";
+      for (let i = 0; i < primeiro; i += 1) {
+        const vazio = document.createElement("div");
+        vazio.className = "cal-dia vazio";
+        vazio.textContent = "♥";
+        grade.appendChild(vazio);
+      }
+      let acesos = 0;
+      for (let dia = 1; dia <= totalDias; dia += 1) {
+        const cel = document.createElement("div");
+        const futuro = ehAtual && dia > hoje.dia;
+        const aceso = temDia(mask, dia) && !futuro;
+        if (aceso) acesos += 1;
+        cel.className = "cal-dia";
+        if (aceso) cel.classList.add("aceso");
+        if (ehAtual && dia === hoje.dia) cel.classList.add("hoje");
+        if (futuro) cel.classList.add("futuro");
+        cel.setAttribute("aria-label", "Dia " + dia + (aceso ? ", coração aceso" : ""));
+        cel.innerHTML = "♥<span>" + dia + "</span>";
+        grade.appendChild(cel);
+      }
+      if (legenda) {
+        if (ehAtual) {
+          const veioHoje = temDia(mask, hoje.dia);
+          legenda.textContent = veioHoje
+            ? "Hoje você veio. " + acesos + (acesos === 1 ? " coração aceso" : " corações acesos") + " neste mês."
+            : acesos + (acesos === 1 ? " coração aceso" : " corações acesos") + " neste mês.";
+        } else {
+          legenda.textContent =
+            acesos + (acesos === 1 ? " coração aceso" : " corações acesos") + " em " + MESES[mes - 1] + ".";
+        }
+      }
+    }
+
+    async function marcarHoje() {
+      const agora = dataBrasil();
+      hoje.ano = agora.ano;
+      hoje.mes = agora.mes;
+      hoje.dia = agora.dia;
+      const id = chaveMes(hoje.ano, hoje.mes);
+      const atual = await mascaraDoMes(hoje.ano, hoje.mes);
+      const nova = (atual | bitDoDia(hoje.dia)) >>> 0;
+      mascaras[id] = nova;
+      salvarLocal(hoje.ano, hoje.mes, nova);
+      if (nova !== atual) await salvarRemoto(hoje.ano, hoje.mes, nova);
+      if (vista.ano === hoje.ano && vista.mes === hoje.mes) pintar();
+    }
+
+    async function irPara(ano, mes) {
+      if (mes < 1) {
+        ano -= 1;
+        mes = 12;
+      }
+      if (mes > 12) {
+        ano += 1;
+        mes = 1;
+      }
+      if (ano < minAno || (ano === minAno && mes < minMes)) return;
+      if (ano > hoje.ano || (ano === hoje.ano && mes > hoje.mes)) return;
+      vista = { ano: ano, mes: mes };
+      await mascaraDoMes(ano, mes);
+      pintar();
+    }
+
+    $("#calAnt").addEventListener("click", () => irPara(vista.ano, vista.mes - 1));
+    $("#calProx").addEventListener("click", () => irPara(vista.ano, vista.mes + 1));
+    marcarHoje();
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") marcarHoje();
+    });
+    setInterval(async () => {
+      const id = chaveMes(vista.ano, vista.mes);
+      const antes = mascaras[id] || 0;
+      const agora = await mascaraDoMes(vista.ano, vista.mes);
+      if (agora !== antes) pintar();
+    }, 4000);
+  }
+
   function abrirCarta() {
     const capa = $("#capa");
     const envelope = $("#envelope");
@@ -1221,13 +1412,14 @@
   iniciarContadores();
   petalas();
   iniciarBarraAmor();
+  iniciarCalendario();
   abrirCarta();
 
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        ".capa, .barra-amor, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
+        ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
       )
     ) {
       return;

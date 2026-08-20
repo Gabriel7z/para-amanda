@@ -16,6 +16,7 @@ Este é o **único** repositório do site: [Gabriel7z/para-amanda](https://githu
 - Vocês se conheceram em **22 de outubro de 2022**
 - Namoro desde **23 de agosto de 2023**
 - Barra de amor em disputa: cada um puxa o coração para o outro
+- Calendário de carinho: cada visita acende o coração do dia
 - Música: clipe oficial de **Duas Metades** (Jorge & Mateus)
 
 Sem foto, o polaroid mostra um coração. Nada quebra.
