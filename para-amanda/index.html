@@ -12,8 +12,9 @@
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:title" content="Para Amanda ♥" />
     <meta property="og:description" content="Você é a minha outra metade. Com todo o meu coração, Gabriel." />
-    <meta property="og:url" content="https://gabriel7z.github.io/para-amanda/" />
+    <meta property="og:url" content="https://gabriel7z.github.io/para-amanda/?amor" />
     <meta property="og:image" content="https://gabriel7z.github.io/para-amanda/og.jpg" />
+    <link rel="canonical" href="https://gabriel7z.github.io/para-amanda/?amor" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Amanda, com a frase: você é a minha outra metade." />
@@ -36,6 +37,30 @@
   </head>
   <body>
     <canvas id="petalas" aria-hidden="true"></canvas>
+
+    <div id="amorIntro" class="amor-intro" hidden>
+      <div class="amor-intro-ceu"></div>
+      <div class="amor-intro-caixa">
+        <p class="secao-olho">carregando</p>
+        <h2 class="amor-intro-titulo">O nosso amor</h2>
+        <div class="barra-amor" data-barra="intro">
+          <figure class="amor-avatar">
+            <img data-avatar="amanda" alt="Amanda" />
+            <figcaption>Amanda</figcaption>
+          </figure>
+          <div class="barra-amor-trilho" aria-hidden="true">
+            <div class="barra-amor-preenchimento" id="amorIntroFill"></div>
+            <span class="barra-amor-coracao">♥</span>
+          </div>
+          <figure class="amor-avatar">
+            <img class="amor-avatar-gabriel" data-avatar="gabriel" alt="Gabriel" />
+            <figcaption>Gabriel</figcaption>
+          </figure>
+        </div>
+        <p class="amor-pct" id="amorIntroPct">0%</p>
+        <p class="amor-intro-nota">infinito, e um pouco mais</p>
+      </div>
+    </div>
 
     <div id="capa" class="capa">
       <div class="capa-ceu"></div>
@@ -67,6 +92,21 @@
         <p class="hero-olho">uma homenagem para</p>
         <h1 class="hero-nome" data-campo="nomeDela">Amanda</h1>
         <p class="hero-titulo" data-campo="tituloHero">Você é a minha outra metade</p>
+        <div class="barra-amor barra-amor-hero" data-barra="hero">
+          <figure class="amor-avatar">
+            <img data-avatar="amanda" alt="Amanda" />
+            <figcaption>Amanda</figcaption>
+          </figure>
+          <div class="barra-amor-trilho" aria-hidden="true">
+            <div class="barra-amor-preenchimento" id="amorBarraFill"></div>
+            <span class="barra-amor-coracao">♥</span>
+          </div>
+          <figure class="amor-avatar">
+            <img class="amor-avatar-gabriel" data-avatar="gabriel" alt="Gabriel" />
+            <figcaption>Gabriel</figcaption>
+          </figure>
+        </div>
+        <p class="amor-pct amor-pct-hero" id="amorBarraPct">0%</p>
         <div id="capaPolaroid" class="capa-polaroid"></div>
         <div class="marcos">
           <div class="marco">

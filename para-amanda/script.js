@@ -1011,6 +1011,100 @@
     return tocar;
   }
 
+  function modoAmor() {
+    try {
+      const busca = new URLSearchParams(window.location.search);
+      if (busca.has("amor")) return true;
+      const hash = (window.location.hash || "").replace(/^#/, "").toLowerCase();
+      return hash === "amor";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function aplicarAvatares() {
+    const amanda = CONFIG.avatarAmanda || (CONFIG.fotos[0] && CONFIG.fotos[0].src);
+    const gabriel = CONFIG.avatarGabriel || "";
+    $$("[data-avatar='amanda']").forEach((img) => {
+      if (!amanda) return;
+      img.src = amanda;
+      img.alt = CONFIG.nomeDela;
+      img.addEventListener("error", () => {
+        img.removeAttribute("src");
+      });
+    });
+    $$("[data-avatar='gabriel']").forEach((img) => {
+      if (!gabriel) return;
+      img.src = gabriel;
+      img.alt = CONFIG.seuNome;
+      img.addEventListener("error", () => {
+        img.removeAttribute("src");
+      });
+    });
+  }
+
+  function animarBarra(fill, coracao, pct, aoTerminar) {
+    if (!fill) {
+      if (aoTerminar) aoTerminar();
+      return;
+    }
+    const reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const duracao = reduzir ? 0 : 2400;
+    const inicio = performance.now();
+
+    function pintar(valor) {
+      const limitado = Math.min(100, Math.max(0, valor));
+      fill.style.width = limitado + "%";
+      if (coracao) coracao.style.left = limitado + "%";
+      if (pct) pct.textContent = valor >= 100 ? "∞" : Math.round(limitado) + "%";
+    }
+
+    if (duracao <= 0) {
+      pintar(100);
+      if (aoTerminar) aoTerminar();
+      return;
+    }
+
+    function passo(agora) {
+      const t = Math.min(1, (agora - inicio) / duracao);
+      const suave = 1 - Math.pow(1 - t, 3);
+      pintar(suave * 100);
+      if (t < 1) requestAnimationFrame(passo);
+      else if (aoTerminar) setTimeout(aoTerminar, 420);
+    }
+
+    requestAnimationFrame(passo);
+  }
+
+  let barraHeroFeita = false;
+  function iniciarBarraAmorHero() {
+    if (barraHeroFeita) return;
+    barraHeroFeita = true;
+    const fill = $("#amorBarraFill");
+    const pct = $("#amorBarraPct");
+    const coracao = fill && fill.parentElement.querySelector(".barra-amor-coracao");
+    animarBarra(fill, coracao, pct);
+  }
+
+  function iniciarIntroAmor(depois) {
+    const intro = $("#amorIntro");
+    if (!intro || !modoAmor()) {
+      if (depois) depois();
+      return;
+    }
+    intro.hidden = false;
+    const fill = $("#amorIntroFill");
+    const pct = $("#amorIntroPct");
+    const coracao = fill && fill.parentElement.querySelector(".barra-amor-coracao");
+    animarBarra(fill, coracao, pct, () => {
+      intro.classList.add("saida");
+      setTimeout(() => {
+        intro.remove();
+        if (depois) depois();
+      }, 800);
+    });
+  }
+
   function abrirCarta() {
     const capa = $("#capa");
     const envelope = $("#envelope");
@@ -1021,6 +1115,7 @@
       site.hidden = false;
       if (tocarMusica) tocarMusica();
       envelope.classList.add("aberto");
+      iniciarBarraAmorHero();
       setTimeout(() => {
         capa.classList.add("saida");
         site.classList.add("visivel");
@@ -1042,6 +1137,7 @@
   }
 
   aplicarTextos();
+  aplicarAvatares();
   montarCarta();
   montarMotivoDoDia();
   montarMotivos();
@@ -1057,13 +1153,13 @@
   montarPromessas();
   iniciarContadores();
   petalas();
-  abrirCarta();
+  iniciarIntroAmor(abrirCarta);
 
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        ".capa, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
+        ".capa, .amor-intro, .barra-amor, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
       )
     ) {
       return;

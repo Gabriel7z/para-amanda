@@ -229,6 +229,10 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
 
   fraseFinal: "Eu te amo, Amanda. E vou continuar te amando.",
 
+  // Fotos redondas da barra de amor (Amanda à esquerda, Gabriel à direita).
+  avatarAmanda: "fotos/avatar-amanda.jpg",
+  avatarGabriel: "fotos/avatar-gabriel.jpg",
+
   // Clipe oficial no canal da dupla (YouTube). Não hospedamos o áudio.
   youtubeId: "HR4ZxjGQGYY",
   musicaTitulo: "Duas Metades",
