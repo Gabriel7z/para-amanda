@@ -1011,17 +1011,6 @@
     return tocar;
   }
 
-  function modoAmor() {
-    try {
-      const busca = new URLSearchParams(window.location.search);
-      if (busca.has("amor")) return true;
-      const hash = (window.location.hash || "").replace(/^#/, "").toLowerCase();
-      return hash === "amor";
-    } catch (e) {
-      return false;
-    }
-  }
-
   function aplicarAvatares() {
     const amanda = CONFIG.avatarAmanda || (CONFIG.fotos[0] && CONFIG.fotos[0].src);
     const gabriel = CONFIG.avatarGabriel || "";
@@ -1043,305 +1032,98 @@
     });
   }
 
-  const AMOR_GUARDA = "para-amanda-amor-v1";
+  const AMOR_GUARDA = "para-amanda-porcentagem-v1";
   const AMOR_API = "https://countapi.mileshilliard.com/api/v1";
-  const AMOR_CHAVES = {
-    amanda: "gabriel7z-para-amanda-amanda-te-ama-v1",
-    gabriel: "gabriel7z-para-amanda-gabriel-te-ama-v1",
-  };
+  const AMOR_CHAVE = "gabriel7z-para-amanda-porcentagem-v1";
 
-  const placarAmor = { amanda: 0, gabriel: 0 };
-  let clicandoAmor = false;
-  let esperaQuem = null;
-
-  function hojeBrasil() {
-    return new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Sao_Paulo",
-    }).format(new Date());
-  }
-
-  function lerEu() {
-    try {
-      const q = new URLSearchParams(window.location.search).get("eu");
-      if (q === "amanda" || q === "gabriel") {
-        localStorage.setItem(AMOR_GUARDA + "-eu", q);
-        return q;
-      }
-      return localStorage.getItem(AMOR_GUARDA + "-eu");
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function salvarEu(quem) {
-    try {
-      localStorage.setItem(AMOR_GUARDA + "-eu", quem);
-    } catch (e) {}
-  }
-
-  function jaClicouHoje(quem) {
-    try {
-      return localStorage.getItem(AMOR_GUARDA + "-dia-" + quem) === hojeBrasil();
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function marcarCliqueHoje(quem) {
-    try {
-      localStorage.setItem(AMOR_GUARDA + "-dia-" + quem, hojeBrasil());
-    } catch (e) {}
-  }
+  let pontosAmor = 0;
+  let pendentesAmor = 0;
+  let mandandoAmor = false;
 
   function numeroApi(dado) {
     const n = Number(dado && dado.value);
     return Number.isFinite(n) ? n : 0;
   }
 
-  async function lerPontos(lado) {
+  function pintarBarraAmor() {
+    const fill = $("#amorFill");
+    const coracao = $("#amorCoracao");
+    const pct = $("#amorPct");
+    const barra = Math.min(100, pontosAmor);
+    if (fill) fill.style.width = barra + "%";
+    if (coracao) coracao.style.left = barra + "%";
+    if (pct) pct.textContent = pontosAmor + "%";
+  }
+
+  async function lerAmorRemoto() {
     try {
-      const r = await fetch(AMOR_API + "/get/" + AMOR_CHAVES[lado]);
+      const r = await fetch(AMOR_API + "/get/" + AMOR_CHAVE);
       if (r.status === 404) return 0;
       if (!r.ok) throw new Error("get");
       return numeroApi(await r.json());
     } catch (e) {
       try {
-        return Number(localStorage.getItem(AMOR_GUARDA + "-" + lado) || 0);
+        return Number(localStorage.getItem(AMOR_GUARDA) || 0);
       } catch (err) {
         return 0;
       }
     }
   }
 
-  async function somarPonto(lado) {
-    const r = await fetch(AMOR_API + "/hit/" + AMOR_CHAVES[lado]);
+  async function somarAmorRemoto() {
+    const r = await fetch(AMOR_API + "/hit/" + AMOR_CHAVE);
     if (!r.ok) throw new Error("hit");
     const n = numeroApi(await r.json());
     try {
-      localStorage.setItem(AMOR_GUARDA + "-" + lado, String(n));
+      localStorage.setItem(AMOR_GUARDA, String(n));
     } catch (e) {}
     return n;
   }
 
-  function textoPlacar() {
-    const a = placarAmor.amanda;
-    const g = placarAmor.gabriel;
-    const eu = lerEu();
-    if (a === 0 && g === 0) {
-      return "Mesmo placar nos dois celulares. Toque no seu retrato — um te amo por dia.";
-    }
-    if (a === g) {
-      return "Empate: " + a + " a " + g + ". Os dois estão vendo este mesmo placar. Quem esquecer sai perdendo.";
-    }
-    if (a > g) {
-      return (
-        CONFIG.nomeDela +
-        " está na frente (" +
-        a +
-        " a " +
-        g +
-        "). " +
-        CONFIG.seuNome +
-        ", não esquece de clicar!"
-      );
-    }
-    return (
-      CONFIG.seuNome +
-      " está na frente (" +
-      g +
-      " a " +
-      a +
-      "). " +
-      CONFIG.nomeDela +
-      ", não esquece de clicar!"
-    );
-  }
-
-  function pintarJogoAmor() {
-    const a = placarAmor.amanda;
-    const g = placarAmor.gabriel;
-    const total = a + g;
-    const pct = total === 0 ? 50 : (a / total) * 100;
-    const eu = lerEu();
-    const frase = textoPlacar();
-    const extra =
-      eu && jaClicouHoje(eu) ? " Hoje você já disse te amo. Amanhã vale ponto de novo." : "";
-
-    $$(".barra-amor-jogo").forEach((barra) => {
-      const fill = barra.querySelector(".barra-amor-preenchimento");
-      const coracao = barra.querySelector(".barra-amor-coracao");
-      if (fill) fill.style.width = pct + "%";
-      if (coracao) coracao.style.left = pct + "%";
-      barra.querySelectorAll("[data-pts]").forEach((el) => {
-        el.textContent = placarAmor[el.dataset.pts] || 0;
-      });
-      barra.querySelectorAll(".amor-lado").forEach((btn) => {
-        const lado = btn.dataset.lado;
-        btn.classList.toggle("sou-eu", eu === lado);
-        btn.classList.toggle("na-frente", total > 0 && placarAmor[lado] > placarAmor[lado === "amanda" ? "gabriel" : "amanda"]);
-      });
-    });
-
-    $$("[data-amor-placar]").forEach((el) => {
-      el.textContent = frase + extra;
-    });
-  }
-
-  function montarBarrasAmor() {
-    const amanda = CONFIG.avatarAmanda || "";
-    const gabriel = CONFIG.avatarGabriel || "";
-    $$(".barra-amor-jogo").forEach((barra) => {
-      if (barra.dataset.pronta === "1") return;
-      barra.dataset.pronta = "1";
-      barra.innerHTML =
-        '<button type="button" class="amor-lado" data-lado="amanda" aria-label="Amanda: eu te amo">' +
-        '<img data-avatar="amanda" alt="" />' +
-        '<span class="amor-lado-nome"></span>' +
-        '<span class="amor-lado-pts" data-pts="amanda">0</span>' +
-        '<span class="amor-lado-acao">eu te amo</span>' +
-        "</button>" +
-        '<div class="barra-amor-trilho" aria-hidden="true">' +
-        '<div class="barra-amor-preenchimento"></div>' +
-        '<span class="barra-amor-coracao">♥</span>' +
-        "</div>" +
-        '<button type="button" class="amor-lado" data-lado="gabriel" aria-label="Gabriel: eu te amo">' +
-        '<img class="amor-avatar-gabriel" data-avatar="gabriel" alt="" />' +
-        '<span class="amor-lado-nome"></span>' +
-        '<span class="amor-lado-pts" data-pts="gabriel">0</span>' +
-        '<span class="amor-lado-acao">eu te amo</span>' +
-        "</button>";
-      const nomes = barra.querySelectorAll(".amor-lado-nome");
-      nomes[0].textContent = CONFIG.nomeDela;
-      nomes[1].textContent = CONFIG.seuNome;
-      const imgs = barra.querySelectorAll("img");
-      if (amanda) imgs[0].src = amanda;
-      if (gabriel) imgs[1].src = gabriel;
-      imgs[0].alt = CONFIG.nomeDela;
-      imgs[1].alt = CONFIG.seuNome;
-    });
-  }
-
-  function pedirQuemSou(depois) {
-    const modal = $("#amorQuem");
-    if (!modal) {
-      if (depois) depois(null);
-      return;
-    }
-    esperaQuem = depois || null;
-    modal.hidden = false;
-  }
-
-  function fecharQuem(quem) {
-    const modal = $("#amorQuem");
-    if (modal) modal.hidden = true;
-    const cb = esperaQuem;
-    esperaQuem = null;
-    if (cb) cb(quem);
-  }
-
-  async function atualizarPlacarRemoto() {
-    const [a, g] = await Promise.all([lerPontos("amanda"), lerPontos("gabriel")]);
-    placarAmor.amanda = a;
-    placarAmor.gabriel = g;
-    pintarJogoAmor();
-  }
-
-  async function clicarLado(lado, origem) {
-    if (clicandoAmor) return;
-    let eu = lerEu();
-    if (!eu) {
-      pedirQuemSou((quem) => {
-        if (quem) clicarLado(lado, origem);
-      });
-      return;
-    }
-    if (lado !== eu) {
-      $$("[data-amor-placar]").forEach((el) => {
-        el.textContent =
-          eu === "amanda"
-            ? "Essa é a parte do " + CONFIG.seuNome + ". Clica no seu retrato."
-            : "Essa é a parte da " + CONFIG.nomeDela + ". Clica no seu retrato.";
-      });
-      return;
-    }
-    if (jaClicouHoje(eu)) {
-      pintarJogoAmor();
-      return;
-    }
-    clicandoAmor = true;
-    try {
-      placarAmor[eu] = await somarPonto(eu);
-      marcarCliqueHoje(eu);
-      pintarJogoAmor();
-      if (origem && origem.getBoundingClientRect) {
-        const r = origem.getBoundingClientRect();
-        soltarCoracao(r.left + r.width / 2, r.top + 12);
-      }
-      chuvaDeCoracoes();
-    } catch (e) {
+  async function enviarAmorPendente() {
+    if (mandandoAmor) return;
+    mandandoAmor = true;
+    while (pendentesAmor > 0) {
+      pendentesAmor -= 1;
       try {
-        const local = Number(localStorage.getItem(AMOR_GUARDA + "-" + eu) || 0) + 1;
-        localStorage.setItem(AMOR_GUARDA + "-" + eu, String(local));
-        placarAmor[eu] = local;
-        marcarCliqueHoje(eu);
-        pintarJogoAmor();
-      } catch (err) {}
+        const n = await somarAmorRemoto();
+        pontosAmor = Math.max(pontosAmor, n);
+      } catch (e) {
+        try {
+          localStorage.setItem(AMOR_GUARDA, String(pontosAmor));
+        } catch (err) {}
+      }
     }
-    clicandoAmor = false;
+    mandandoAmor = false;
+    pintarBarraAmor();
   }
 
-  function iniciarJogoAmor() {
-    montarBarrasAmor();
-    aplicarAvatares();
-    pintarJogoAmor();
-    atualizarPlacarRemoto();
-
-    $$(".barra-amor-jogo").forEach((barra) => {
-      barra.addEventListener("click", (e) => {
-        const btn = e.target.closest(".amor-lado");
-        if (!btn) return;
-        clicarLado(btn.dataset.lado, btn);
-      });
-    });
-
-    const modal = $("#amorQuem");
-    if (modal) {
-      modal.querySelectorAll("[data-eu]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          salvarEu(btn.dataset.eu);
-          fecharQuem(btn.dataset.eu);
-          pintarJogoAmor();
-        });
-      });
+  function clicarAmor(evento) {
+    pontosAmor += 1;
+    pendentesAmor += 1;
+    pintarBarraAmor();
+    enviarAmorPendente();
+    if (evento && typeof evento.clientX === "number") {
+      soltarCoracao(evento.clientX, evento.clientY);
     }
+  }
 
-    setInterval(atualizarPlacarRemoto, 20000);
+  async function atualizarAmorRemoto() {
+    const n = await lerAmorRemoto();
+    pontosAmor = Math.max(pontosAmor, n);
+    pintarBarraAmor();
+  }
+
+  function iniciarBarraAmor() {
+    const barra = $("#barraAmor");
+    const trilho = $("#btnAmor");
+    if (!barra || !trilho) return;
+    pintarBarraAmor();
+    atualizarAmorRemoto();
+    barra.addEventListener("click", clicarAmor);
+    setInterval(atualizarAmorRemoto, 8000);
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") atualizarPlacarRemoto();
-    });
-  }
-
-  function iniciarIntroAmor(depois) {
-    const intro = $("#amorIntro");
-    if (!intro || !modoAmor()) {
-      if (depois) depois();
-      return;
-    }
-    intro.hidden = false;
-    if (!lerEu()) pedirQuemSou(function () {
-      pintarJogoAmor();
-    });
-    const abrir = $("#amorIntroAbrir");
-    if (!abrir) {
-      if (depois) depois();
-      return;
-    }
-    abrir.addEventListener("click", () => {
-      intro.classList.add("saida");
-      setTimeout(() => {
-        intro.remove();
-        if (depois) depois();
-      }, 700);
+      if (document.visibilityState === "visible") atualizarAmorRemoto();
     });
   }
 
@@ -1392,14 +1174,14 @@
   montarPromessas();
   iniciarContadores();
   petalas();
-  iniciarJogoAmor();
-  iniciarIntroAmor(abrirCarta);
+  iniciarBarraAmor();
+  abrirCarta();
 
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        ".capa, .amor-intro, .amor-quem, .barra-amor, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
+        ".capa, .barra-amor, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
       )
     ) {
       return;

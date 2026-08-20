@@ -1426,131 +1426,7 @@ code {
   }
 }
 
-/* ---------- Barra de amor (competição) ---------- */
-
-.amor-quem {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  display: grid;
-  place-items: center;
-  padding: 2rem 6vw;
-  background: rgba(26, 6, 14, 0.72);
-  backdrop-filter: blur(10px);
-}
-
-.amor-quem[hidden] {
-  display: none;
-}
-
-.amor-quem-caixa {
-  width: min(420px, 100%);
-  background: var(--papel);
-  color: var(--tinta);
-  border-radius: 24px;
-  padding: 1.8rem 1.5rem 1.5rem;
-  text-align: center;
-  box-shadow: var(--sombra);
-}
-
-.amor-quem-caixa h2 {
-  font-family: var(--fonte-script);
-  font-size: 2.4rem;
-  font-weight: 400;
-  color: var(--vinho);
-  margin: 0.2rem 0 0.6rem;
-}
-
-.amor-quem-caixa p {
-  font-size: 0.95rem;
-  line-height: 1.45;
-  opacity: 0.85;
-}
-
-.amor-quem-botoes {
-  display: grid;
-  gap: 0.7rem;
-  margin-top: 1.2rem;
-}
-
-.amor-quem-btn {
-  border: 1px solid var(--ouro);
-  background: var(--creme);
-  color: var(--vinho);
-  border-radius: 999px;
-  padding: 0.85rem 1rem;
-  font: 600 1rem var(--fonte-texto);
-  cursor: pointer;
-}
-
-.amor-quem-btn:hover {
-  background: var(--vinho);
-  color: var(--creme);
-  border-color: var(--vinho);
-}
-
-.amor-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: grid;
-  place-items: center;
-  padding: 2rem 6vw;
-  background:
-    radial-gradient(ellipse at 50% 0%, #7a2744 0%, transparent 55%),
-    radial-gradient(circle at 80% 80%, #2a0c18 0%, transparent 40%),
-    var(--vinho);
-  color: var(--creme);
-  text-align: center;
-  transition: opacity 0.8s ease, visibility 0.8s ease;
-}
-
-.amor-intro[hidden] {
-  display: none;
-}
-
-.amor-intro.saida {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.amor-intro-ceu {
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(1.5px 1.5px at 12% 18%, var(--ouro-claro), transparent),
-    radial-gradient(1.5px 1.5px at 28% 72%, #fff, transparent),
-    radial-gradient(1.2px 1.2px at 67% 24%, var(--blush), transparent),
-    radial-gradient(1.5px 1.5px at 81% 63%, #fff, transparent),
-    radial-gradient(1px 1px at 44% 40%, var(--ouro), transparent);
-  opacity: 0.7;
-  animation: cintilar 6s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.amor-intro-caixa {
-  position: relative;
-  z-index: 1;
-  width: min(560px, 100%);
-  display: grid;
-  gap: 0.85rem;
-  justify-items: center;
-}
-
-.amor-intro-titulo {
-  font-family: var(--fonte-script);
-  font-size: clamp(2.4rem, 8vw, 3.8rem);
-  font-weight: 400;
-  color: #fff6ea;
-  line-height: 1;
-}
-
-.amor-intro-nota {
-  font-family: var(--fonte-titulo);
-  font-style: italic;
-  opacity: 0.8;
-}
+/* ---------- Barra de amor ---------- */
 
 .barra-amor {
   display: flex;
@@ -1561,14 +1437,9 @@ code {
 
 .amor-lado {
   flex: 0 0 auto;
-  width: 86px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+  width: 72px;
+  margin: 0;
   text-align: center;
-  font: inherit;
-  padding: 0;
 }
 
 .amor-lado img {
@@ -1582,28 +1453,17 @@ code {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
   background:
     radial-gradient(circle at 50% 45%, #f3c5d0, #c45c74 70%);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .amor-avatar-gabriel {
   object-position: 40% 20%;
 }
 
-.amor-lado:hover img,
-.amor-lado:focus-visible img {
-  transform: scale(1.06);
+.amor-lado-dela img {
+  box-shadow: 0 0 0 3px rgba(232, 180, 196, 0.45), 0 8px 20px rgba(0, 0, 0, 0.28);
 }
 
-.amor-lado.sou-eu img {
-  box-shadow: 0 0 0 3px var(--vinho), 0 0 0 6px var(--ouro);
-}
-
-.amor-lado.na-frente img {
-  transform: scale(1.08);
-}
-
-.amor-lado-nome {
-  display: block;
+.amor-lado figcaption {
   margin-top: 0.35rem;
   font-size: 0.68rem;
   letter-spacing: 0.12em;
@@ -1611,72 +1471,68 @@ code {
   opacity: 0.8;
 }
 
-.amor-lado-pts {
-  display: block;
-  font-family: var(--fonte-titulo);
-  font-size: 1.35rem;
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-.amor-lado-acao {
-  display: block;
-  font-size: 0.68rem;
-  color: var(--ouro-claro);
-  margin-top: 0.1rem;
-}
-
 .barra-amor-trilho {
   position: relative;
   flex: 1;
-  height: 16px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #d4b483, #f0debd);
+  height: 22px;
   border: 1px solid rgba(240, 222, 189, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 247, 238, 0.14);
   overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+}
+
+.barra-amor-trilho:hover,
+.barra-amor-trilho:focus-visible {
+  box-shadow: 0 0 0 3px rgba(240, 222, 189, 0.35);
 }
 
 .barra-amor-preenchimento {
+  display: block;
   height: 100%;
-  width: 50%;
+  width: 0%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #9b2d48, #e07086);
+  background: linear-gradient(90deg, #9b2d48, #e07086 70%, #f0debd);
   box-shadow: 0 0 16px rgba(232, 180, 196, 0.45);
-  transition: width 0.7s ease;
+  transition: width 0.18s ease;
 }
 
 .barra-amor-coracao {
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 0%;
   transform: translate(-50%, -50%);
   color: #fff6ea;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   text-shadow: 0 2px 8px rgba(59, 16, 32, 0.45);
   pointer-events: none;
-  transition: left 0.7s ease;
+  transition: left 0.18s ease;
+}
+
+.amor-pct {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ouro-claro);
 }
 
 .amor-placar {
   font-family: var(--fonte-titulo);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-style: italic;
   line-height: 1.35;
   max-width: 22em;
-  min-height: 2.6em;
+  color: var(--ouro-claro);
+  opacity: 0.9;
 }
 
 .barra-amor-hero {
-  margin-top: 0.6rem;
-}
-
-.amor-placar-hero {
-  color: var(--ouro-claro);
-  margin: 0 0 0.2rem;
-}
-
-.amor-intro .barra-amor-trilho {
-  box-shadow: inset 0 0 0 1px rgba(255, 247, 238, 0.12);
+  margin-top: 0.85rem;
 }
 
 @media (max-width: 800px) {
@@ -1684,13 +1540,14 @@ code {
     grid-template-columns: 1fr;
   }
 
-  .amor-lado {
-    width: 72px;
-  }
-
+  .amor-lado,
   .amor-lado img {
     width: 58px;
     height: 58px;
+  }
+
+  .amor-lado {
+    height: auto;
   }
 
   .barra-amor {
