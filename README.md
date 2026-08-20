@@ -18,6 +18,6 @@ Este é o **único** repositório do site: [Gabriel7z/para-amanda](https://githu
 - Barra de amor em disputa: cada um puxa o coração para o outro
 - Calendário de carinho: cada visita acende o coração do dia
 - Música: rodízio de três clipes oficiais, um por dia, com troca às **20h** (Brasília) — Jorge & Mateus, Henrique & Juliano, Leandro & Leonardo
-- Bilhetes de aniversário: o do dia em que vocês se conheceram abre em **22 de outubro**; o do namoro abre em **23 de agosto**. Quando ela entra, aparece um anúncio. Se ainda não for o dia, o site diz daqui quantas horas pode abrir. Na primeira abertura, soltam fogos.
+- Bilhetes de aniversário: o do dia em que vocês se conheceram abre em **22 de agosto**; o do namoro abre em **23 de agosto**. Quando ela entra, aparece um anúncio. Se ainda não for o dia, o site diz daqui quantas horas pode abrir. Na primeira abertura, soltam fogos.
 
 Sem foto, o polaroid mostra um coração. Nada quebra.

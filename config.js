@@ -126,14 +126,14 @@ Eu te amo, meu grande amor! 🥺❤️`,
   ],
 
   // Aniversários: o bilhete fica lacrado até o dia (horário de Brasília).
-  // 22/10 — o dia em que vocês se conheceram; 23/08 — o dia do namoro.
+  // 22/08 — aniversário do dia em que vocês se conheceram; 23/08 — aniversário de namoro.
   bilhetesAniversario: [
     {
       id: "conheceu",
-      mes: 10,
+      mes: 8,
       dia: 22,
       titulo: "O dia em que a gente se conheceu",
-      quando: "Abra no dia 22 de outubro",
+      quando: "Abra no dia 22 de agosto",
       texto: `Meu amor,
 
 Aqui vai ficar o recado deste dia. Eu ainda vou escrever as palavras certas para você.
