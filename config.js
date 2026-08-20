@@ -232,7 +232,7 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
   avatarAmanda: "fotos/avatar-amanda.jpg",
   avatarGabriel: "fotos/avatar-gabriel.jpg",
 
-  // Clipe oficial no canal da dupla (YouTube). Não hospedamos o áudio.
+  // Clipes oficiais no YouTube. Não hospedamos o áudio.
   // Rodízio: uma música por dia, na ordem abaixo, e depois recomeça.
   musicas: [
     {
@@ -242,16 +242,19 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
       frase: "Porque a gente se completa.",
     },
     {
-      youtubeId: "nSSceWPREBA",
-      titulo: "Amo Noite e Dia",
-      artista: "Jorge & Mateus",
-      frase: "Passa o dia, passa a noite — tô apaixonado.",
+      // Canal oficial Henrique e Juliano — TO BE Ao Vivo em Brasília.
+      // O vídeo é um pot-pourri; pulamos para Realidade ou Fantasia (~1:34).
+      youtubeId: "g0IDYUlFn5I",
+      inicio: 94,
+      titulo: "Realidade ou Fantasia",
+      artista: "Henrique & Juliano",
+      frase: "E tem sido você, na realidade ou fantasia.",
     },
     {
-      youtubeId: "ICS6uKC93w0",
-      titulo: "Os Anjos Cantam",
-      artista: "Jorge & Mateus",
-      frase: "E os anjos cantam o nosso amor.",
+      youtubeId: "vSsUDOpzYOs",
+      titulo: "É Por Você Que Canto",
+      artista: "Leandro & Leonardo",
+      frase: "É por você que canto.",
     },
   ],
 };

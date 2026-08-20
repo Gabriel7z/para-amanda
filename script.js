@@ -965,6 +965,7 @@
           playsinline: 1,
           loop: 1,
           playlist: hoje.youtubeId,
+          start: hoje.inicio || 0,
           origin: window.location.origin,
           enablejsapi: 1,
         },
@@ -996,7 +997,7 @@
               e.data === YT.PlayerState.ENDED
             ) {
               try {
-                player.seekTo(0, true);
+                player.seekTo(hoje.inicio || 0, true);
                 player.playVideo();
               } catch (err) {}
             }
