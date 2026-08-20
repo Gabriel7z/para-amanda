@@ -2,34 +2,6 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-  function ehCelular() {
-    return window.matchMedia("(max-width: 800px), (pointer: coarse)").matches;
-  }
-
-  let travaRolagem = 0;
-  let rolagemSalva = 0;
-  let fundoPausadoAte = 0;
-
-  function pausarFundo(ms) {
-    fundoPausadoAte = Math.max(fundoPausadoAte, performance.now() + (ms || 0));
-  }
-
-  function travarTela() {
-    travaRolagem += 1;
-    if (travaRolagem !== 1) return;
-    rolagemSalva = window.scrollY || window.pageYOffset || 0;
-    document.body.style.top = "-" + rolagemSalva + "px";
-    document.body.classList.add("tela-travada");
-  }
-
-  function soltarTela() {
-    travaRolagem = Math.max(0, travaRolagem - 1);
-    if (travaRolagem !== 0) return;
-    document.body.classList.remove("tela-travada");
-    document.body.style.top = "";
-    window.scrollTo(0, rolagemSalva);
-  }
-
   function aplicarTextos() {
     $$("[data-campo]").forEach((el) => {
       const chave = el.dataset.campo;
@@ -500,13 +472,11 @@
       cap.textContent = foto.legenda;
       caixa.hidden = false;
       document.body.classList.add("lightbox-aberto");
-      travarTela();
     }
 
     function fechar() {
       caixa.hidden = true;
       document.body.classList.remove("lightbox-aberto");
-      soltarTela();
     }
 
     window.abrirFoto = mostrar;
@@ -638,7 +608,7 @@
       : "Você pode abrir daqui " + horas + " horas.";
   }
 
-  function preencherPapelBilhete(bilhete, opts) {
+  function preencherPapelBilhete(bilhete) {
     const modal = $("#bilheteModal");
     if (!bilhete || !modal) return false;
     $("#bilheteQuando").textContent = bilhete.titulo || bilhete.quando || "";
@@ -654,7 +624,6 @@
       });
     modal.hidden = false;
     document.body.classList.add("bilhete-aberto");
-    if (!(opts && opts.jaTravado)) travarTela();
     return true;
   }
 
@@ -677,12 +646,11 @@
     if (id) aviso.dataset.anivAviso = id;
   }
 
-  function fecharAnuncioAniv(manterTrava) {
+  function fecharAnuncioAniv() {
     const anuncio = $("#anuncioAniversario");
     if (!anuncio) return;
     anuncio.hidden = true;
     document.body.classList.remove("anuncio-aberto");
-    if (!manterTrava) soltarTela();
     const aviso = $("#anuncioAnivAviso");
     if (aviso) {
       aviso.hidden = true;
@@ -719,10 +687,8 @@
       return;
     }
     const primeira = !anivJaAberto(item.id);
-    const anuncio = $("#anuncioAniversario");
-    const veioDoAnuncio = anuncio && !anuncio.hidden;
-    fecharAnuncioAniv(veioDoAnuncio);
-    if (!preencherPapelBilhete(item, { jaTravado: veioDoAnuncio })) return;
+    fecharAnuncioAniv();
+    if (!preencherPapelBilhete(item)) return;
     marcarAniv(item.id);
     $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
     if (primeira && (item.id === "conheceu" || item.id === "namoro")) soltarFogos();
@@ -772,7 +738,6 @@
     anivPorProximidade().forEach((item) => grade.appendChild(criarCartaoAniv(item)));
     anuncio.hidden = false;
     document.body.classList.add("anuncio-aberto");
-    travarTela();
   }
 
   function soltarFogos() {
@@ -783,8 +748,7 @@
       return;
     }
 
-    const celular = ehCelular();
-    pausarFundo(7000);
+    const celular = window.matchMedia("(max-width: 800px), (pointer: coarse)").matches;
     canvas.hidden = false;
     const ctx = canvas.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, celular ? 1.25 : 1.5);
@@ -939,7 +903,6 @@
     function fechar() {
       modal.hidden = true;
       document.body.classList.remove("bilhete-aberto");
-      soltarTela();
     }
 
     $("#bilheteFechar").addEventListener("click", fechar);
@@ -1046,7 +1009,6 @@
     function abrir() {
       caixa.hidden = false;
       document.body.classList.add("cinema-aberto");
-      travarTela();
       comecar();
       if (tocarMusica) tocarMusica();
     }
@@ -1055,7 +1017,6 @@
       clearTimeout(timer);
       caixa.hidden = true;
       document.body.classList.remove("cinema-aberto");
-      soltarTela();
     }
 
     function alternarPausa() {
@@ -1164,93 +1125,55 @@
     if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
-    const ctx = canvas.getContext("2d", { alpha: true });
-    const celular = ehCelular();
+    const ctx = canvas.getContext("2d");
     let w = 0;
     let h = 0;
-    let ultimoW = 0;
-    let ultimoH = 0;
-    let ultimoQuadro = 0;
     const flakes = [];
-    const qtd = celular ? 10 : 22;
-    const dpr = Math.min(window.devicePixelRatio || 1, celular ? 1.25 : 1.5);
 
-    function resize(forcar) {
-      const nw = window.innerWidth;
-      const nh = window.innerHeight;
-      if (
-        !forcar &&
-        Math.abs(nw - ultimoW) < 8 &&
-        Math.abs(nh - ultimoH) < 140
-      ) {
-        return;
-      }
-      ultimoW = nw;
-      ultimoH = nh;
-      w = nw;
-      h = nh;
-      canvas.width = Math.round(nw * dpr);
-      canvas.height = Math.round(nh * dpr);
-      canvas.style.width = nw + "px";
-      canvas.style.height = nh + "px";
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
     }
 
-    function criar() {
-      flakes.length = 0;
+    function criar(qtd) {
       for (let i = 0; i < qtd; i += 1) {
         flakes.push({
-          x: Math.random() * Math.max(w, 1),
-          y: Math.random() * Math.max(h, 1),
-          r: celular ? 3 + Math.random() * 4 : 4 + Math.random() * 6,
-          s: 0.25 + Math.random() * 0.45,
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 4 + Math.random() * 7,
+          s: 0.4 + Math.random() * 0.9,
           a: Math.random() * Math.PI * 2,
-          cor: Math.random() > 0.5 ? "rgba(232,180,196,0.45)" : "rgba(196,92,116,0.32)",
+          cor: Math.random() > 0.5 ? "rgba(232,180,196,0.7)" : "rgba(196,92,116,0.55)",
         });
       }
     }
 
-    function desenhar(t) {
-      if (document.hidden || t < fundoPausadoAte) {
-        requestAnimationFrame(desenhar);
-        return;
-      }
-      if (celular && t - ultimoQuadro < 40) {
-        requestAnimationFrame(desenhar);
-        return;
-      }
-      ultimoQuadro = t;
+    function desenhar() {
       ctx.clearRect(0, 0, w, h);
-      for (let i = 0; i < flakes.length; i += 1) {
-        const p = flakes[i];
+      flakes.forEach((p) => {
         p.y += p.s;
-        p.x += Math.sin(p.a) * 0.35;
-        p.a += 0.008;
-        if (p.y > h + 12) {
-          p.y = -12;
+        p.x += Math.sin(p.a) * 0.6;
+        p.a += 0.01;
+        if (p.y > h + 10) {
+          p.y = -10;
           p.x = Math.random() * w;
         }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.a);
         ctx.fillStyle = p.cor;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, p.r, p.r * 0.6, 0, 0, Math.PI * 2);
         ctx.fill();
-      }
+        ctx.restore();
+      });
       requestAnimationFrame(desenhar);
     }
 
-    resize(true);
-    criar();
-    window.addEventListener(
-      "resize",
-      function () {
-        resize(false);
-      },
-      { passive: true }
-    );
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) ctx.clearRect(0, 0, w, h);
-    });
-    requestAnimationFrame(desenhar);
+    resize();
+    criar(28);
+    window.addEventListener("resize", resize);
+    desenhar();
   }
 
   function soltarCoracao(x, y) {
@@ -1265,14 +1188,14 @@
   }
 
   function chuvaDeCoracoes() {
-    const total = ehCelular() ? 12 : 28;
+    const total = 28;
     for (let i = 0; i < total; i += 1) {
       setTimeout(() => {
         soltarCoracao(
           Math.random() * window.innerWidth,
           window.innerHeight - 40 - Math.random() * 80
         );
-      }, i * 70);
+      }, i * 50);
     }
   }
 
@@ -1948,17 +1871,8 @@
   iniciarCalendario();
   abrirCarta();
 
-  window.addEventListener(
-    "scroll",
-    function () {
-      pausarFundo(320);
-    },
-    { passive: true }
-  );
-
   $("#btnCoracoes").addEventListener("click", chuvaDeCoracoes);
   document.addEventListener("click", (e) => {
-    if (ehCelular()) return;
     if (
       e.target.closest(
         ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .anuncio-aniv, .roleta-cena, .ceu-moldura"

@@ -24,7 +24,6 @@
 
 html {
   scroll-behavior: smooth;
-  overscroll-behavior-y: none;
 }
 
 body {
@@ -32,24 +31,14 @@ body {
   color: var(--tinta);
   background: var(--vinho);
   min-height: 100vh;
-  min-height: 100svh;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
 }
 
 body.lightbox-aberto,
 body.cinema-aberto,
 body.bilhete-aberto,
-body.anuncio-aberto,
-body.tela-travada {
+body.anuncio-aberto {
   overflow: hidden;
-}
-
-body.tela-travada {
-  position: fixed;
-  left: 0;
-  right: 0;
-  width: 100%;
 }
 
 img {
@@ -76,7 +65,6 @@ code {
   height: 100%;
   pointer-events: none;
   z-index: 40;
-  contain: layout paint;
 }
 
 /* ---------- Capa / envelope ---------- */
@@ -1809,10 +1797,6 @@ code {
 @media (max-width: 800px) {
   html {
     scroll-behavior: auto;
-  }
-
-  .envelope {
-    animation: none;
   }
 
   .marcos {
