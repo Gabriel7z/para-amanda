@@ -69,21 +69,23 @@
         <h1 class="hero-nome" data-campo="nomeDela">Amanda</h1>
         <p class="hero-titulo" data-campo="tituloHero">Você é a minha outra metade</p>
         <div class="barra-amor barra-amor-hero" id="barraAmor">
-          <figure class="amor-lado">
+          <button type="button" class="amor-lado" data-lado="gabriel" aria-label="Gabriel: eu te amo">
             <img class="amor-avatar-gabriel" data-avatar="gabriel" alt="Gabriel" />
-            <figcaption data-campo="seuNome">Gabriel</figcaption>
-          </figure>
-          <button type="button" class="barra-amor-trilho" id="btnAmor" aria-label="Aumentar a porcentagem de amor">
+            <span class="amor-lado-nome" data-campo="seuNome">Gabriel</span>
+            <span class="amor-lado-pts" id="ptsGabriel">0</span>
+          </button>
+          <div class="barra-amor-trilho" id="trilhoAmor" role="slider" aria-label="Disputa de amor">
             <span class="barra-amor-preenchimento" id="amorFill"></span>
             <span class="barra-amor-coracao" id="amorCoracao">♥</span>
-          </button>
-          <figure class="amor-lado amor-lado-dela">
+          </div>
+          <button type="button" class="amor-lado amor-lado-dela" data-lado="amanda" aria-label="Amanda: eu te amo">
             <img data-avatar="amanda" alt="Amanda" />
-            <figcaption data-campo="nomeDela">Amanda</figcaption>
-          </figure>
+            <span class="amor-lado-nome" data-campo="nomeDela">Amanda</span>
+            <span class="amor-lado-pts" id="ptsAmanda">0</span>
+          </button>
         </div>
-        <p class="amor-pct" id="amorPct">0%</p>
-        <p class="amor-placar">Toque na barra quantas vezes quiser. Cada toque enche um pouco mais, indo até ela.</p>
+        <p class="amor-pct" id="amorPct">50%</p>
+        <p class="amor-placar" id="amorPlacar">Toque no seu retrato. Você puxa o coração até ela; ela puxa até você. Quem clicar mais, ama mais.</p>
         <div id="capaPolaroid" class="capa-polaroid"></div>
         <div class="marcos">
           <div class="marco">

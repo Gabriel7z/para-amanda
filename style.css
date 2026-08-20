@@ -1437,9 +1437,15 @@ code {
 
 .amor-lado {
   flex: 0 0 auto;
-  width: 72px;
+  width: 86px;
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   text-align: center;
+  cursor: pointer;
 }
 
 .amor-lado img {
@@ -1453,6 +1459,17 @@ code {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
   background:
     radial-gradient(circle at 50% 45%, #f3c5d0, #c45c74 70%);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.amor-lado:hover img,
+.amor-lado:focus-visible img {
+  transform: scale(1.07);
+}
+
+.amor-lado.na-frente img {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px var(--ouro), 0 8px 20px rgba(0, 0, 0, 0.28);
 }
 
 .amor-avatar-gabriel {
@@ -1463,12 +1480,22 @@ code {
   box-shadow: 0 0 0 3px rgba(232, 180, 196, 0.45), 0 8px 20px rgba(0, 0, 0, 0.28);
 }
 
+.amor-lado-nome,
 .amor-lado figcaption {
+  display: block;
   margin-top: 0.35rem;
   font-size: 0.68rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   opacity: 0.8;
+}
+
+.amor-lado-pts {
+  display: block;
+  font-family: var(--fonte-titulo);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
 .barra-amor-trilho {
@@ -1480,37 +1507,32 @@ code {
   background: rgba(255, 247, 238, 0.14);
   overflow: hidden;
   cursor: pointer;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-  appearance: none;
 }
 
-.barra-amor-trilho:hover,
-.barra-amor-trilho:focus-visible {
+.barra-amor-trilho:hover {
   box-shadow: 0 0 0 3px rgba(240, 222, 189, 0.35);
 }
 
 .barra-amor-preenchimento {
   display: block;
   height: 100%;
-  width: 0%;
+  width: 50%;
   border-radius: inherit;
   background: linear-gradient(90deg, #9b2d48, #e07086 70%, #f0debd);
   box-shadow: 0 0 16px rgba(232, 180, 196, 0.45);
-  transition: width 0.18s ease;
+  transition: width 0.22s ease;
 }
 
 .barra-amor-coracao {
   position: absolute;
   top: 50%;
-  left: 0%;
+  left: 50%;
   transform: translate(-50%, -50%);
   color: #fff6ea;
   font-size: 1.2rem;
   text-shadow: 0 2px 8px rgba(59, 16, 32, 0.45);
   pointer-events: none;
-  transition: left 0.18s ease;
+  transition: left 0.22s ease;
 }
 
 .amor-pct {
@@ -1540,14 +1562,14 @@ code {
     grid-template-columns: 1fr;
   }
 
-  .amor-lado,
+  .amor-lado {
+    width: 72px;
+    height: auto;
+  }
+
   .amor-lado img {
     width: 58px;
     height: 58px;
-  }
-
-  .amor-lado {
-    height: auto;
   }
 
   .barra-amor {

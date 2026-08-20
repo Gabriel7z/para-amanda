@@ -1032,12 +1032,15 @@
     });
   }
 
-  const AMOR_GUARDA = "para-amanda-porcentagem-v1";
+  const AMOR_GUARDA = "para-amanda-disputa-v1";
   const AMOR_API = "https://countapi.mileshilliard.com/api/v1";
-  const AMOR_CHAVE = "gabriel7z-para-amanda-porcentagem-v1";
+  const AMOR_CHAVES = {
+    gabriel: "gabriel7z-para-amanda-disputa-gabriel-v1",
+    amanda: "gabriel7z-para-amanda-disputa-amanda-v1",
+  };
 
-  let pontosAmor = 0;
-  let pendentesAmor = 0;
+  const placarAmor = { gabriel: 0, amanda: 0 };
+  const pendentesAmor = { gabriel: 0, amanda: 0 };
   let mandandoAmor = false;
 
   function numeroApi(dado) {
@@ -1046,36 +1049,63 @@
   }
 
   function pintarBarraAmor() {
+    const g = placarAmor.gabriel;
+    const a = placarAmor.amanda;
+    const total = g + a;
+    const pctDele = total === 0 ? 50 : (g / total) * 100;
     const fill = $("#amorFill");
     const coracao = $("#amorCoracao");
     const pct = $("#amorPct");
-    const barra = Math.min(100, pontosAmor);
-    if (fill) fill.style.width = barra + "%";
-    if (coracao) coracao.style.left = barra + "%";
-    if (pct) pct.textContent = pontosAmor + "%";
+    const frase = $("#amorPlacar");
+    const ptsG = $("#ptsGabriel");
+    const ptsA = $("#ptsAmanda");
+    if (fill) fill.style.width = pctDele + "%";
+    if (coracao) coracao.style.left = pctDele + "%";
+    if (ptsG) ptsG.textContent = g;
+    if (ptsA) ptsA.textContent = a;
+    $$(".amor-lado").forEach((btn) => {
+      const lado = btn.dataset.lado;
+      const outro = lado === "gabriel" ? "amanda" : "gabriel";
+      btn.classList.toggle("na-frente", total > 0 && placarAmor[lado] > placarAmor[outro]);
+    });
+    if (pct && frase) {
+      if (total === 0 || g === a) {
+        pct.textContent = "50%";
+        frase.textContent =
+          "Empate. Toque no seu retrato: você puxa o coração até ela, ela puxa até você.";
+      } else if (g > a) {
+        pct.textContent = Math.round(pctDele) + "%";
+        frase.textContent =
+          CONFIG.seuNome + " está amando mais. O coração foi até " + CONFIG.nomeDela + ".";
+      } else {
+        pct.textContent = Math.round(100 - pctDele) + "%";
+        frase.textContent =
+          CONFIG.nomeDela + " está amando mais. O coração voltou até " + CONFIG.seuNome + ".";
+      }
+    }
   }
 
-  async function lerAmorRemoto() {
+  async function lerLadoRemoto(lado) {
     try {
-      const r = await fetch(AMOR_API + "/get/" + AMOR_CHAVE);
+      const r = await fetch(AMOR_API + "/get/" + AMOR_CHAVES[lado]);
       if (r.status === 404) return 0;
       if (!r.ok) throw new Error("get");
       return numeroApi(await r.json());
     } catch (e) {
       try {
-        return Number(localStorage.getItem(AMOR_GUARDA) || 0);
+        return Number(localStorage.getItem(AMOR_GUARDA + "-" + lado) || 0);
       } catch (err) {
         return 0;
       }
     }
   }
 
-  async function somarAmorRemoto() {
-    const r = await fetch(AMOR_API + "/hit/" + AMOR_CHAVE);
+  async function somarLadoRemoto(lado) {
+    const r = await fetch(AMOR_API + "/hit/" + AMOR_CHAVES[lado]);
     if (!r.ok) throw new Error("hit");
     const n = numeroApi(await r.json());
     try {
-      localStorage.setItem(AMOR_GUARDA, String(n));
+      localStorage.setItem(AMOR_GUARDA + "-" + lado, String(n));
     } catch (e) {}
     return n;
   }
@@ -1083,24 +1113,28 @@
   async function enviarAmorPendente() {
     if (mandandoAmor) return;
     mandandoAmor = true;
-    while (pendentesAmor > 0) {
-      pendentesAmor -= 1;
-      try {
-        const n = await somarAmorRemoto();
-        pontosAmor = Math.max(pontosAmor, n);
-      } catch (e) {
+    for (const lado of ["gabriel", "amanda"]) {
+      while (pendentesAmor[lado] > 0) {
+        pendentesAmor[lado] -= 1;
         try {
-          localStorage.setItem(AMOR_GUARDA, String(pontosAmor));
-        } catch (err) {}
+          const n = await somarLadoRemoto(lado);
+          placarAmor[lado] = Math.max(placarAmor[lado], n);
+        } catch (e) {
+          try {
+            localStorage.setItem(AMOR_GUARDA + "-" + lado, String(placarAmor[lado]));
+          } catch (err) {}
+        }
       }
     }
     mandandoAmor = false;
     pintarBarraAmor();
+    if (pendentesAmor.gabriel > 0 || pendentesAmor.amanda > 0) enviarAmorPendente();
   }
 
-  function clicarAmor(evento) {
-    pontosAmor += 1;
-    pendentesAmor += 1;
+  function clicarLado(lado, evento) {
+    if (lado !== "gabriel" && lado !== "amanda") return;
+    placarAmor[lado] += 1;
+    pendentesAmor[lado] += 1;
     pintarBarraAmor();
     enviarAmorPendente();
     if (evento && typeof evento.clientX === "number") {
@@ -1109,18 +1143,29 @@
   }
 
   async function atualizarAmorRemoto() {
-    const n = await lerAmorRemoto();
-    pontosAmor = Math.max(pontosAmor, n);
+    const [g, a] = await Promise.all([lerLadoRemoto("gabriel"), lerLadoRemoto("amanda")]);
+    placarAmor.gabriel = Math.max(placarAmor.gabriel, g);
+    placarAmor.amanda = Math.max(placarAmor.amanda, a);
     pintarBarraAmor();
   }
 
   function iniciarBarraAmor() {
     const barra = $("#barraAmor");
-    const trilho = $("#btnAmor");
-    if (!barra || !trilho) return;
+    const trilho = $("#trilhoAmor");
+    if (!barra) return;
     pintarBarraAmor();
     atualizarAmorRemoto();
-    barra.addEventListener("click", clicarAmor);
+    barra.addEventListener("click", (e) => {
+      const botao = e.target.closest(".amor-lado");
+      if (botao) {
+        clicarLado(botao.dataset.lado, e);
+        return;
+      }
+      if (!trilho || !trilho.contains(e.target)) return;
+      const caixa = trilho.getBoundingClientRect();
+      const meio = caixa.left + caixa.width / 2;
+      clicarLado(e.clientX < meio ? "gabriel" : "amanda", e);
+    });
     setInterval(atualizarAmorRemoto, 8000);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") atualizarAmorRemoto();
