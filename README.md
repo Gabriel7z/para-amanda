@@ -8,10 +8,7 @@ Este é o **único** repositório do site: [Gabriel7z/para-amanda](https://githu
 
 **https://gabriel7z.github.io/para-amanda/?amor**
 
-Esse é o endereço certo: a barra de amor é um placar. Ela clica no retrato dela, você no seu. Um te amo por dia — quem esquecer fica atrás. O preview do WhatsApp usa a `og.jpg` com a foto dela.
-
-No celular da Amanda: […/?amor&eu=amanda](https://gabriel7z.github.io/para-amanda/?amor&eu=amanda)  
-No seu: […/?amor&eu=gabriel](https://gabriel7z.github.io/para-amanda/?amor&eu=gabriel)
+É **um link só**, nos dois celulares. O placar é o mesmo: ela clica no retrato dela, você no seu, um te amo por dia. Quem esquecer fica atrás. O preview do WhatsApp usa a `og.jpg` com a foto dela.
 
 ## O que já está no site
 

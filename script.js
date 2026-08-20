@@ -1128,10 +1128,10 @@
     const g = placarAmor.gabriel;
     const eu = lerEu();
     if (a === 0 && g === 0) {
-      return "Toque no seu retrato. Um te amo por dia — quem esquecer fica atrás.";
+      return "Mesmo placar nos dois celulares. Toque no seu retrato — um te amo por dia.";
     }
     if (a === g) {
-      return "Empate: " + a + " a " + g + ". Quem esquecer de clicar sai perdendo.";
+      return "Empate: " + a + " a " + g + ". Os dois estão vendo este mesmo placar. Quem esquecer sai perdendo.";
     }
     if (a > g) {
       return (
@@ -1328,6 +1328,9 @@
       return;
     }
     intro.hidden = false;
+    if (!lerEu()) pedirQuemSou(function () {
+      pintarJogoAmor();
+    });
     const abrir = $("#amorIntroAbrir");
     if (!abrir) {
       if (depois) depois();
