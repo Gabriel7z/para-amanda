@@ -1,3 +1,0 @@
-Arraste as fotos para esta pasta.
-Depois abra o index.html.
-Ou, no site, clique em "Escolher fotos deste computador".

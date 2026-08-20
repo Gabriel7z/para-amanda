@@ -2,6 +2,8 @@
 
 Homenagem de Gabriel para Amanda: envelope, carta, a barra de amor, a história de vocês e **Duas Metades**, do Jorge & Mateus.
 
+Este é o **único** repositório do site: [Gabriel7z/para-amanda](https://github.com/Gabriel7z/para-amanda).
+
 ## Link para ela
 
 **https://gabriel7z.github.io/para-amanda/?amor**
