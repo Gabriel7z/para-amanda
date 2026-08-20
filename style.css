@@ -36,7 +36,8 @@ body {
 
 body.lightbox-aberto,
 body.cinema-aberto,
-body.bilhete-aberto {
+body.bilhete-aberto,
+body.anuncio-aberto {
   overflow: hidden;
 }
 
@@ -1369,6 +1370,41 @@ code {
   background: radial-gradient(circle at 35% 30%, #cbb08e, #9c7a4f 65%, #7b5c37);
 }
 
+.bilhete.especial {
+  background: linear-gradient(180deg, #f7e6c8 0%, #e8c4ad 100%);
+  box-shadow: 0 14px 28px rgba(59, 16, 32, 0.22), 0 0 0 1px rgba(212, 180, 131, 0.55);
+}
+
+.bilhete.lacrado {
+  cursor: pointer;
+}
+
+.bilhete.lacrado .bilhete-lacre {
+  background: radial-gradient(circle at 35% 30%, #7a2744, #3b1020 70%);
+}
+
+.bilhete-espera {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--vinho-medio);
+  min-height: 2.4em;
+}
+
+.bilhete.balancar {
+  animation: aniv-balanco 0.45s ease;
+}
+
+@keyframes aniv-balanco {
+  0%,
+  100% { transform: translateX(0); }
+  20% { transform: translateX(-7px) rotate(-1.5deg); }
+  40% { transform: translateX(7px) rotate(1.5deg); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
 .bilhete-modal {
   position: fixed;
   inset: 0;
@@ -1434,6 +1470,97 @@ code {
   font-size: 2.4rem;
   line-height: 1;
   cursor: pointer;
+}
+
+/* ---------- Anúncio de aniversário ---------- */
+
+.anuncio-aniv {
+  position: fixed;
+  inset: 0;
+  z-index: 92;
+  background: rgba(22, 6, 12, 0.82);
+  display: grid;
+  place-items: center;
+  padding: 4vh 5vw;
+  overflow-y: auto;
+  animation: nascer 0.45s ease both;
+}
+
+.anuncio-aniv[hidden] {
+  display: none;
+}
+
+.anuncio-aniv-caixa {
+  width: min(640px, 100%);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(232, 180, 196, 0.22), transparent 55%),
+    var(--papel);
+  border: 1px solid rgba(212, 180, 131, 0.7);
+  border-radius: 18px;
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+  box-shadow: var(--sombra);
+  text-align: center;
+}
+
+.anuncio-aniv-olho {
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 600;
+}
+
+.anuncio-aniv-caixa h2 {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.7rem, 5vw, 2.3rem);
+  color: var(--vinho);
+  margin: 0.35rem 0 0.6rem;
+}
+
+.anuncio-aniv-sub {
+  color: var(--vinho-medio);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+.anuncio-aniv-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.9rem;
+}
+
+.anuncio-aniv-aviso {
+  margin-top: 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(196, 92, 116, 0.14);
+  color: var(--vinho);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.anuncio-aniv-depois {
+  margin-top: 1.15rem;
+  border: 0;
+  background: transparent;
+  color: var(--rose);
+  font: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#fogos {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 120;
 }
 
 /* ---------- Promessas ---------- */

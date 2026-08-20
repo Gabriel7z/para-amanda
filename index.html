@@ -213,8 +213,8 @@
         <p class="secao-olho revelar">para guardar</p>
         <h2 class="secao-titulo revelar">Bilhetes lacrados</h2>
         <p class="secao-sub revelar">
-          Escrevi cada um pensando num dia seu. Abra no dia certo — eles esperam
-          por você.
+          Os de aniversário só abrem no dia 22 e no dia 23. Os outros esperam o
+          momento certo.
         </p>
         <div class="grade-bilhetes" id="gradeBilhetes"></div>
       </section>
@@ -276,6 +276,22 @@
         </p>
       </article>
     </div>
+
+    <div id="anuncioAniversario" class="anuncio-aniv" hidden>
+      <div class="anuncio-aniv-caixa" role="dialog" aria-labelledby="anuncioAnivTitulo">
+        <p class="anuncio-aniv-olho">você tem recado</p>
+        <h2 id="anuncioAnivTitulo">Dois bilhetes de aniversário</h2>
+        <p class="anuncio-aniv-sub">
+          Um para o dia em que a gente se conheceu. Outro para o dia do nosso namoro.
+          Cada um só abre no dia certo.
+        </p>
+        <div class="anuncio-aniv-grade" id="anuncioAnivGrade"></div>
+        <p class="anuncio-aniv-aviso" id="anuncioAnivAviso" hidden></p>
+        <button type="button" class="anuncio-aniv-depois" id="anuncioAnivDepois">depois eu abro</button>
+      </div>
+    </div>
+
+    <canvas id="fogos" hidden aria-hidden="true"></canvas>
 
     <script src="config.js"></script>
     <script src="script.js"></script>

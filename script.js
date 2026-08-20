@@ -517,6 +517,7 @@
   }
 
   const CHAVE_BILHETES = "para-amanda:bilhetes";
+  const CHAVE_ANIV = "para-amanda:aniv-abertos";
 
   function bilhetesAbertos() {
     try {
@@ -539,15 +540,81 @@
     }
   }
 
-  function abrirBilhete(indice, botao) {
-    const bilhete = CONFIG.bilhetes[indice];
-    const modal = $("#bilheteModal");
-    if (!bilhete || !modal) return;
+  function listaAniversario() {
+    return Array.isArray(CONFIG.bilhetesAniversario)
+      ? CONFIG.bilhetesAniversario.filter((item) => item && item.id)
+      : [];
+  }
 
-    $("#bilheteQuando").textContent = bilhete.quando;
+  function anivPorProximidade() {
+    return listaAniversario()
+      .slice()
+      .sort((a, b) => {
+        const aAgora = podeAbrirAniv(a) && !anivJaAberto(a.id);
+        const bAgora = podeAbrirAniv(b) && !anivJaAberto(b.id);
+        if (aAgora !== bAgora) return aAgora ? -1 : 1;
+        return msAteBilheteAniv(a) - msAteBilheteAniv(b);
+      });
+  }
+
+  function anivAbertos() {
+    try {
+      const lista = JSON.parse(localStorage.getItem(CHAVE_ANIV) || "[]");
+      return Array.isArray(lista) ? lista : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function anivJaAberto(id) {
+    return anivAbertos().indexOf(id) !== -1;
+  }
+
+  function marcarAniv(id) {
+    try {
+      const lista = anivAbertos();
+      if (lista.indexOf(id) === -1) {
+        lista.push(id);
+        localStorage.setItem(CHAVE_ANIV, JSON.stringify(lista));
+      }
+    } catch (e) {}
+  }
+
+  function msAteBilheteAniv(item) {
+    const b = partesBrasil();
+    let ano = b.ano;
+    if (b.mes * 100 + b.dia >= item.mes * 100 + item.dia) ano += 1;
+    return instanteLocalBrasilParaMs(ano, item.mes, item.dia, 0, 0, 0) - Date.now();
+  }
+
+  function podeAbrirAniv(item) {
+    if (anivJaAberto(item.id)) return true;
+    const b = partesBrasil();
+    return b.mes * 100 + b.dia >= item.mes * 100 + item.dia;
+  }
+
+  function textoPodeAbrirDaqui(ms) {
+    if (ms <= 0) return "Você já pode abrir este bilhete.";
+    const horasCheias = ms / 3600000;
+    if (horasCheias < 1) {
+      const min = Math.max(1, Math.ceil(ms / 60000));
+      return min === 1
+        ? "Você pode abrir daqui 1 minuto."
+        : "Você pode abrir daqui " + min + " minutos.";
+    }
+    const horas = Math.max(1, Math.ceil(horasCheias));
+    return horas === 1
+      ? "Você pode abrir daqui 1 hora."
+      : "Você pode abrir daqui " + horas + " horas.";
+  }
+
+  function preencherPapelBilhete(bilhete) {
+    const modal = $("#bilheteModal");
+    if (!bilhete || !modal) return false;
+    $("#bilheteQuando").textContent = bilhete.titulo || bilhete.quando || "";
     const corpo = $("#bilheteTexto");
     corpo.textContent = "";
-    bilhete.texto
+    String(bilhete.texto || "")
       .trim()
       .split(/\n\s*\n/)
       .forEach((paragrafo) => {
@@ -555,43 +622,298 @@
         p.textContent = paragrafo.trim();
         corpo.appendChild(p);
       });
-
     modal.hidden = false;
     document.body.classList.add("bilhete-aberto");
-    marcarBilhete(indice);
+    return true;
+  }
 
+  function abrirBilhete(indice, botao) {
+    const bilhete = CONFIG.bilhetes[indice];
+    if (!preencherPapelBilhete(bilhete)) return;
+    marcarBilhete(indice);
     if (botao) {
       botao.classList.add("aberto");
-      botao.querySelector(".bilhete-abrir").textContent = "ler de novo";
+      const abrir = botao.querySelector(".bilhete-abrir");
+      if (abrir) abrir.textContent = "ler de novo";
     }
+  }
+
+  function mostrarAvisoAniv(texto, id) {
+    const aviso = $("#anuncioAnivAviso");
+    if (!aviso) return;
+    aviso.hidden = false;
+    aviso.textContent = texto;
+    if (id) aviso.dataset.anivAviso = id;
+  }
+
+  function fecharAnuncioAniv() {
+    const anuncio = $("#anuncioAniversario");
+    if (!anuncio) return;
+    anuncio.hidden = true;
+    document.body.classList.remove("anuncio-aberto");
+    const aviso = $("#anuncioAnivAviso");
+    if (aviso) {
+      aviso.hidden = true;
+      delete aviso.dataset.anivAviso;
+    }
+  }
+
+  function pintarCartaoAniv(btn, item) {
+    const aberto = anivJaAberto(item.id);
+    const liberado = podeAbrirAniv(item);
+    btn.classList.toggle("aberto", aberto);
+    btn.classList.toggle("lacrado", !liberado);
+    const acao = btn.querySelector(".bilhete-abrir");
+    const espera = btn.querySelector(".bilhete-espera");
+    if (acao) {
+      acao.textContent = aberto ? "ler de novo" : liberado ? "abrir" : "lacrado";
+    }
+    if (espera) {
+      espera.hidden = liberado;
+      espera.textContent = liberado ? "" : textoPodeAbrirDaqui(msAteBilheteAniv(item));
+    }
+  }
+
+  function tentarAbrirAniv(item, botao) {
+    if (!podeAbrirAniv(item)) {
+      const msg = textoPodeAbrirDaqui(msAteBilheteAniv(item));
+      if (botao) {
+        botao.classList.remove("balancar");
+        void botao.offsetWidth;
+        botao.classList.add("balancar");
+        pintarCartaoAniv(botao, item);
+      }
+      mostrarAvisoAniv(msg, item.id);
+      return;
+    }
+    const primeira = !anivJaAberto(item.id);
+    fecharAnuncioAniv();
+    if (!preencherPapelBilhete(item)) return;
+    marcarAniv(item.id);
+    $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
+    if (primeira) soltarFogos();
+  }
+
+  function criarCartaoAniv(item) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "bilhete especial";
+    btn.dataset.anivId = item.id;
+    btn.innerHTML =
+      '<span class="bilhete-lacre" aria-hidden="true">♥</span>' +
+      '<span class="bilhete-quando"></span>' +
+      '<span class="bilhete-abrir"></span>' +
+      '<span class="bilhete-espera" data-aniv-espera></span>';
+    btn.querySelector(".bilhete-quando").textContent = item.quando;
+    pintarCartaoAniv(btn, item);
+    btn.addEventListener("click", () => tentarAbrirAniv(item, btn));
+    btn.addEventListener("animationend", () => btn.classList.remove("balancar"));
+    return btn;
+  }
+
+  function atualizarEsperasAniv() {
+    listaAniversario().forEach((item) => {
+      $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
+    });
+    const aviso = $("#anuncioAnivAviso");
+    const anuncio = $("#anuncioAniversario");
+    if (aviso && anuncio && !anuncio.hidden && !aviso.hidden && aviso.dataset.anivAviso) {
+      const item = listaAniversario().find((x) => x.id === aviso.dataset.anivAviso);
+      if (item) {
+        aviso.textContent = podeAbrirAniv(item)
+          ? "Você já pode abrir este bilhete."
+          : textoPodeAbrirDaqui(msAteBilheteAniv(item));
+      }
+    }
+  }
+
+  function mostrarAnuncioAniversario() {
+    const anuncio = $("#anuncioAniversario");
+    const grade = $("#anuncioAnivGrade");
+    const lista = listaAniversario();
+    if (!anuncio || !grade || !lista.length) return;
+    const faltaAbrir = lista.some((item) => !anivJaAberto(item.id));
+    if (!faltaAbrir) return;
+    grade.textContent = "";
+    anivPorProximidade().forEach((item) => grade.appendChild(criarCartaoAniv(item)));
+    anuncio.hidden = false;
+    document.body.classList.add("anuncio-aberto");
+  }
+
+  function soltarFogos() {
+    const canvas = $("#fogos");
+    if (!canvas) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      chuvaDeCoracoes();
+      return;
+    }
+
+    canvas.hidden = false;
+    const ctx = canvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = 0;
+    let h = 0;
+    const foguetes = [];
+    const faíscas = [];
+    const cores = ["#fff6ea", "#d4b483", "#e8b4c4", "#c45c74", "#ffd166", "#ff6b8a", "#ffe8a3"];
+
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function lancar() {
+      const alvoY = h * (0.16 + Math.random() * 0.28);
+      foguetes.push({
+        x: w * (0.12 + Math.random() * 0.76),
+        y: h + 8,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -(6.2 + Math.random() * 3.4),
+        alvoY: alvoY,
+        cor: cores[(Math.random() * cores.length) | 0],
+        vivo: true,
+      });
+    }
+
+    function estourar(f) {
+      const n = 52 + ((Math.random() * 28) | 0);
+      for (let i = 0; i < n; i += 1) {
+        const ang = (Math.PI * 2 * i) / n + Math.random() * 0.15;
+        const vel = 1.3 + Math.random() * 3.8;
+        faíscas.push({
+          x: f.x,
+          y: f.y,
+          vx: Math.cos(ang) * vel,
+          vy: Math.sin(ang) * vel,
+          vida: 1,
+          dec: 0.01 + Math.random() * 0.012,
+          r: 1.5 + Math.random() * 2.4,
+          cor: Math.random() > 0.22 ? f.cor : cores[(Math.random() * cores.length) | 0],
+          coracao: Math.random() > 0.84,
+        });
+      }
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+    let lancamentos = 0;
+    lancar();
+    const timer = window.setInterval(() => {
+      if (lancamentos < 9) {
+        lancar();
+        if (Math.random() > 0.45) lancar();
+        lancamentos += 1;
+      } else {
+        window.clearInterval(timer);
+      }
+    }, 360);
+
+    const inicio = performance.now();
+    let quadro = 0;
+    function frame(t) {
+      ctx.clearRect(0, 0, w, h);
+      foguetes.forEach((f) => {
+        if (!f.vivo) return;
+        f.x += f.vx;
+        f.y += f.vy;
+        f.vy += 0.055;
+        ctx.fillStyle = f.cor;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        if (f.vy >= -0.4 || f.y <= f.alvoY) {
+          f.vivo = false;
+          estourar(f);
+        }
+      });
+      for (let i = faíscas.length - 1; i >= 0; i -= 1) {
+        const p = faíscas[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.032;
+        p.vx *= 0.992;
+        p.vida -= p.dec;
+        if (p.vida <= 0) {
+          faíscas.splice(i, 1);
+          continue;
+        }
+        ctx.globalAlpha = Math.max(0, p.vida);
+        ctx.fillStyle = p.cor;
+        if (p.coracao) {
+          ctx.font = 9 + p.r * 2 + "px serif";
+          ctx.fillText("♥", p.x, p.y);
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+      const acabou =
+        t - inicio > 6800 &&
+        foguetes.every((f) => !f.vivo) &&
+        faíscas.length === 0;
+      if (acabou) {
+        window.removeEventListener("resize", resize);
+        ctx.clearRect(0, 0, w, h);
+        canvas.hidden = true;
+        return;
+      }
+      quadro = window.requestAnimationFrame(frame);
+    }
+    quadro = window.requestAnimationFrame(frame);
+    return function parar() {
+      window.cancelAnimationFrame(quadro);
+      window.clearInterval(timer);
+      window.removeEventListener("resize", resize);
+      ctx.clearRect(0, 0, w, h);
+      canvas.hidden = true;
+    };
   }
 
   function montarBilhetes() {
     const secao = $("#bilhetes");
     const grade = $("#gradeBilhetes");
-    const lista = CONFIG.bilhetes;
-    if (!secao || !grade || !Array.isArray(lista) || !lista.length) return;
+    const comuns = CONFIG.bilhetes;
+    const especiais = listaAniversario();
+    if (!secao || !grade) return;
+    const temComuns = Array.isArray(comuns) && comuns.length;
+    if (!temComuns && !especiais.length) return;
 
-    const abertos = bilhetesAbertos();
-    lista.forEach((bilhete, i) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "bilhete revelar";
-      btn.innerHTML =
-        '<span class="bilhete-lacre" aria-hidden="true">♥</span>' +
-        '<span class="bilhete-quando"></span>' +
-        '<span class="bilhete-abrir"></span>';
-      btn.querySelector(".bilhete-quando").textContent = bilhete.quando;
-      const jaAberto = abertos.indexOf(i) !== -1;
-      btn.classList.toggle("aberto", jaAberto);
-      btn.querySelector(".bilhete-abrir").textContent = jaAberto
-        ? "ler de novo"
-        : "abrir";
-      btn.addEventListener("click", () => abrirBilhete(i, btn));
+    anivPorProximidade().forEach((item) => {
+      const btn = criarCartaoAniv(item);
+      btn.classList.add("revelar");
       grade.appendChild(btn);
     });
 
+    const abertos = bilhetesAbertos();
+    if (temComuns) {
+      comuns.forEach((bilhete, i) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bilhete revelar";
+        btn.innerHTML =
+          '<span class="bilhete-lacre" aria-hidden="true">♥</span>' +
+          '<span class="bilhete-quando"></span>' +
+          '<span class="bilhete-abrir"></span>';
+        btn.querySelector(".bilhete-quando").textContent = bilhete.quando;
+        const jaAberto = abertos.indexOf(i) !== -1;
+        btn.classList.toggle("aberto", jaAberto);
+        btn.querySelector(".bilhete-abrir").textContent = jaAberto
+          ? "ler de novo"
+          : "abrir";
+        btn.addEventListener("click", () => abrirBilhete(i, btn));
+        grade.appendChild(btn);
+      });
+    }
+
     secao.hidden = false;
+    window.setInterval(atualizarEsperasAniv, 1000);
   }
 
   function iniciarBilhetes() {
@@ -610,6 +932,18 @@
     document.addEventListener("keydown", (e) => {
       if (!modal.hidden && e.key === "Escape") fechar();
     });
+
+    const anuncio = $("#anuncioAniversario");
+    const depois = $("#anuncioAnivDepois");
+    if (depois) depois.addEventListener("click", fecharAnuncioAniv);
+    if (anuncio) {
+      anuncio.addEventListener("click", (e) => {
+        if (e.target === anuncio) fecharAnuncioAniv();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!anuncio.hidden && e.key === "Escape") fecharAnuncioAniv();
+      });
+    }
   }
 
   function iniciarCinema() {
@@ -1522,6 +1856,7 @@
           desenharCeu();
         } catch (err) {}
         setTimeout(() => capa.remove(), 1000);
+        setTimeout(mostrarAnuncioAniversario, 900);
       }, 650);
     }
 
@@ -1560,7 +1895,7 @@
   document.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .roleta-cena, .ceu-moldura"
+        ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .anuncio-aniv, .roleta-cena, .ceu-moldura"
       )
     ) {
       return;
