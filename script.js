@@ -725,7 +725,7 @@
     if (!preencherPapelBilhete(item, { jaTravado: veioDoAnuncio })) return;
     marcarAniv(item.id);
     $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
-    if (primeira) soltarFogos();
+    if (primeira && (item.id === "conheceu" || item.id === "namoro")) soltarFogos();
   }
 
   function criarCartaoAniv(item) {
