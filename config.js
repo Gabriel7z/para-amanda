@@ -284,10 +284,9 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
       frase: "Porque a gente se completa.",
     },
     {
-      // Canal oficial Henrique e Juliano — TO BE Ao Vivo em Brasília.
-      // O vídeo é um pot-pourri; pulamos para Realidade ou Fantasia (~1:34).
-      youtubeId: "g0IDYUlFn5I",
-      inicio: 94,
+      // Montagem só de Realidade ou Fantasia (TO BE Brasília + áudio ao vivo).
+      // O clipe oficial é um pot-pourri de três músicas; este começa na faixa certa.
+      youtubeId: "_k2ty4A5x1w",
       titulo: "Realidade ou Fantasia",
       artista: "Henrique & Juliano",
       frase: "E tem sido você, na realidade ou fantasia.",
