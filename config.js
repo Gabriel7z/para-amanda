@@ -135,11 +135,21 @@ Eu te amo, meu grande amor! 🥺❤️`,
       dia: 22,
       titulo: "O dia em que a gente se conheceu",
       quando: "Abra no dia 22 de agosto",
-      texto: `Meu amor,
+      texto: `Meu grande amor, hojeee exatamente hoje, dia 22, vamos fazer 1.400 dias juntooos — ou melhor, que a gente se conheceu 🤣
 
-Aqui vai ficar o recado deste dia. Eu ainda vou escrever as palavras certas para você.
+Quando voltamos no tempo, bem para aquele dia em que você foi lá em casa, amor, minha estratégia foi sensacional: arrumei um jeito de falar com você e ainda pegar seu número e o seu Instagram 🤣❤️‍🩹
 
-Eu te amo.`,
+Eu sou muitooo genioooo, amor, mas eu jurava que estava bloqueado 🤣 Nunca vamos saber se eu estava ou não!
+
+Foi muito booom, e louvado seja o Senhor. Você foi a melhor coisa que já me aconteceu. Você foi uma bênção na minha vida. Eu olhava para você e achei que nunca teria o prazer de ser seu, e você ser minha. Achava um sonho distante, mas aqui estamos: a mulher com quem eu sonhei, a mulher que eu desejei na minha vida, a mulher mais linda que eu já vi. Meu coração sempre bateu tão forte quando te via. O quanto foi maravilhoso a primeira vez que nós nos vimos. Achei que seria impossível te ver 🤣 Achei que seria a primeira vez e a última vez. Eu lembro que escrevi uma cartinha para você. Eu nem me recordo o que estava escrito 🤣❤️‍🩹
+
+Mas eu fui preparado, e lá fui eu. Quem diria que a menina durona iria me dar uns beijinhos. Foi um dos dias mais felizes da minha vida, porque eu saí com esperança e cheio de vontade. Aquele momento me deu força para continuar e batalhar por você, pelo amor que eu sentia. E vivemos muitoooo. Eu nunca vou esquecer sobre a calcinha ❤️‍🩹🤣 Hoje isso gerou meio que um fetiche em você, môr. Eu tenho vontade de saber todas 🤣🤣❤️‍🩹 Eu gosto muitooo!
+
+A gente caminhou juntos, ali sempre aprendendo um com o outro. Apesar de não sermos namorados, fomos nos tornando inseparáveis. Teve vários momentos em que tentamos ficar longe — ou melhor, você tentou ficar longe — mas, ainda assim, não conseguimos. Louvado seja o Senhor por tudo isso. Eu te amo imensamente desde sempre, desde quando eu consigo me lembrar. E eu me sinto grato por ter você. Eu te amoo muito mais do que naquele dia 22/08/22, e eu te amo muito mais do que em 22/07/26, porque meu amor por você é constantemente aumentativo. Eu só sei que te amo. Eu peço a Deus que seja para sempre.
+
+Obrigado por todos os nossos momentos, meu amor. Você é incrível. Você é um sonho que eu realizo constantemente.
+
+Eu tenho orgulho de você, minha garota.`,
     },
     {
       id: "namoro",
