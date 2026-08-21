@@ -125,7 +125,8 @@ Eu te amo, meu grande amor! 🥺❤️`,
     "Te amar de um jeito calmo, constante e sincero",
   ],
 
-  // Aniversários: o bilhete fica lacrado até o dia (horário de Brasília).
+  // Aniversários: o lacre abre à meia-noite (00:00, horário de Brasília) do dia.
+  // Na primeira abertura de cada um, soltam fogos.
   // 22/08 — aniversário do dia em que vocês se conheceram; 23/08 — aniversário de namoro.
   bilhetesAniversario: [
     {

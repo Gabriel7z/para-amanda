@@ -690,7 +690,9 @@
     if (!preencherPapelBilhete(item)) return;
     marcarAniv(item.id);
     $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
-    if (primeira && (item.id === "conheceu" || item.id === "namoro")) soltarFogos();
+    if (primeira && (item.id === "conheceu" || item.id === "namoro")) {
+      window.setTimeout(soltarFogos, 220);
+    }
   }
 
   function criarCartaoAniv(item) {
@@ -891,7 +893,23 @@
     }
 
     secao.hidden = false;
-    window.setInterval(atualizarEsperasAniv, 8000);
+    window.setInterval(atualizarEsperasAniv, 1000);
+    agendarLiberacaoAniv();
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") atualizarEsperasAniv();
+    });
+  }
+
+  function agendarLiberacaoAniv() {
+    listaAniversario().forEach((item) => {
+      if (podeAbrirAniv(item)) return;
+      const ms = msAteBilheteAniv(item);
+      if (ms <= 0 || ms > 48 * 3600000) return;
+      window.setTimeout(function () {
+        atualizarEsperasAniv();
+        agendarLiberacaoAniv();
+      }, ms + 400);
+    });
   }
 
   function iniciarBilhetes() {
