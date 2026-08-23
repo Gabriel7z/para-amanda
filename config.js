@@ -157,11 +157,34 @@ Eu tenho orgulho de você, minha garota.`,
       dia: 23,
       titulo: "O nosso aniversário de namoro",
       quando: "Abra no dia 23 de agosto",
-      texto: `Meu amor,
+      texto: `Meu amor, estou escrevendo esse texto a 33 minutos antes do nosso dia, ligueil aquela música bem baixinho, fiquei uns 2 minutos refletindo, passando nossas histórias, tentando achar tudo, e tudo é por você!
 
-Aqui vai ficar o recado deste dia. Eu ainda vou escrever as palavras certas para você.
+Eu não consigo olhar para minha vida hoje e pensar em um mundo onde viveria sem você, meu coração dói só de pensar te perde, me dá vontade até de chorar 😭🥺 você sempre aprendi como te amar, mas nunca aprendi como deixar de te amar, hoje foi eu olho para você, e é por você que eu luto, que eu busco, que tento sonhar é por nosssa família, por nossos filhos, esses que ainda viram🤣❤️
 
-Eu te amo.`,
+Mas tudo para honrar, você! Vocês! Eu tenho muito orgulho de você, essa namorada incrível, maravilhosa, cheia de vida, cheia de  senhos, cheia de amor, de aconchego, cheia de vida, que me deu vida!
+
+E hoje comentamos uma data muito especial, muito importante para nós, 3 anos juntos vivendo cada segundo ao seu lado, eu percebo o quanto pouco tempo é, eu queria ter a oportunidade de viver com você 1.00000000 anos, eu quero te o prazer te amar para sempre! O que seria de mim sem você meu amor?🥺❤️
+
+O quanto você por nossa história, o quanto você teve que ser forte, o quanto você teve me amar, o quanto você teve que passar por cima de tantas r várias coisas, e você esta aqui cmg, o que seria eu, semestre você? De quando você estendeu sua mão para mim, para me tirar daquele buraco da depressão, quantas inseguranças minhas voce tratou, você cuidou me deu apoio, quantas vezes você teve que me ver no chão, e teve que fazer de tudo para poder me levantar, sem você meu amor, o que seria de mim?
+
+Eu te amo muito muito, você é tudo para mim, as pessoas nunca nunca vão entender o quanto eu amo você, mas você sempre vai saber o porquê eu te amoo tanto; é porque VOCÊ me ama muito, e eu apenas tento retribuir tudo que eu recebo!
+
+Eu sou muito, muito feliz por ter você, eu sou grato a Deus, eu tenho orgulho de você ser minha namorada, eu tenho orgulho de ser seu, obrigado meu amor, que seja data se repita por um século!🥺❤️
+
+Quanto mais o tempo passa, mais eu gosto de você!
+
+❤️🥺
+
+#meu ibge
+#minha dengosa
+#meu tudo
+#meu amor
+#minha vida
+#meu senso
+#meu bem
+#mor
+#amorzinho
+#princesa`,
     },
   ],
 
