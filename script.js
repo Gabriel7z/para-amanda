@@ -588,7 +588,7 @@
   }
 
   function podeAbrirAniv(item) {
-    if (anivJaAberto(item.id)) return true;
+    if (anivJaAberto(item.id) || item.liberado) return true;
     const b = partesBrasil();
     return b.mes * 100 + b.dia >= item.mes * 100 + item.dia;
   }
@@ -690,7 +690,7 @@
     if (!preencherPapelBilhete(item)) return;
     marcarAniv(item.id);
     $$("[data-aniv-id='" + item.id + "']").forEach((card) => pintarCartaoAniv(card, item));
-    if (primeira && (item.id === "conheceu" || item.id === "namoro")) {
+    if (primeira && (item.fogos || item.id === "conheceu" || String(item.id || "").indexOf("namoro") === 0)) {
       window.setTimeout(soltarFogos, 220);
     }
   }

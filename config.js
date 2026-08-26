@@ -152,11 +152,13 @@ Obrigado por todos os nossos momentos, meu amor. Você é incrível. Você é um
 Eu tenho orgulho de você, minha garota.`,
     },
     {
-      id: "namoro",
+      id: "namoro-2026",
       mes: 8,
       dia: 23,
       titulo: "O nosso aniversário de namoro",
-      quando: "Abra no dia 23 de agosto",
+      quando: "Já pode abrir",
+      liberado: true,
+      fogos: true,
       texto: `Meu amor, estou escrevendo esse texto a 33 minutos antes do nosso dia, ligueil aquela música bem baixinho, fiquei uns 2 minutos refletindo, passando nossas histórias, tentando achar tudo, e tudo é por você!
 
 Eu não consigo olhar para minha vida hoje e pensar em um mundo onde viveria sem você, meu coração dói só de pensar te perde, me dá vontade até de chorar 😭🥺 você sempre aprendi como te amar, mas nunca aprendi como deixar de te amar, hoje foi eu olho para você, e é por você que eu luto, que eu busco, que tento sonhar é por nosssa família, por nossos filhos, esses que ainda viram🤣❤️
