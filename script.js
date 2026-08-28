@@ -1048,6 +1048,357 @@
     });
   }
 
+  const MESES_PT = [
+    "janeiro",
+    "fevereiro",
+    "março",
+    "abril",
+    "maio",
+    "junho",
+    "julho",
+    "agosto",
+    "setembro",
+    "outubro",
+    "novembro",
+    "dezembro",
+  ];
+
+  function parseISO(iso) {
+    const partes = String(iso || "")
+      .split("-")
+      .map(Number);
+    return { ano: partes[0], mes: partes[1], dia: partes[2] };
+  }
+
+  function utcDias(a, b) {
+    return Math.round(
+      (Date.UTC(b.ano, b.mes - 1, b.dia) - Date.UTC(a.ano, a.mes - 1, a.dia)) /
+        86400000
+    );
+  }
+
+  function formatarDataBR(ano, mes, dia) {
+    return dia + " de " + MESES_PT[mes - 1] + " de " + ano;
+  }
+
+  function textoFalta(n) {
+    if (n <= 0) return "é hoje";
+    if (n === 1) return "é amanhã";
+    return "daqui " + n + " dias";
+  }
+
+  function embaralhar(lista) {
+    const a = lista.slice();
+    for (let i = a.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    return a;
+  }
+
+  function proximaOcorrencia(mes, dia, hoje) {
+    let ano = hoje.ano;
+    if (hoje.mes * 100 + hoje.dia >= mes * 100 + dia) ano += 1;
+    return { ano: ano, mes: mes, dia: dia };
+  }
+
+  function somarDiasUTC(inicio, dias) {
+    const d = new Date(Date.UTC(inicio.ano, inicio.mes - 1, inicio.dia + dias));
+    return {
+      ano: d.getUTCFullYear(),
+      mes: d.getUTCMonth() + 1,
+      dia: d.getUTCDate(),
+    };
+  }
+
+  function proximoMultiploDias(inicioISO, passo, hoje) {
+    const inicio = parseISO(inicioISO);
+    const passados = Math.max(0, utcDias(inicio, hoje));
+    let alvo = Math.ceil(passados / passo) * passo;
+    if (alvo < passo) alvo = passo;
+    if (alvo < passados) alvo += passo;
+    const data = somarDiasUTC(inicio, alvo);
+    return { alvo: alvo, data: data, falta: utcDias(hoje, data) };
+  }
+
+  function montarProximosMarcos() {
+    const caixa = $("#proximosMarcosLista");
+    const secao = $("#proximosMarcos");
+    if (!caixa || !secao) return;
+    const hoje = partesBrasil();
+    const hojeDia = { ano: hoje.ano, mes: hoje.mes, dia: hoje.dia };
+    const conheceu = parseISO(CONFIG.dataConheceu);
+    const namoro = parseISO(CONFIG.dataNamoro);
+    const lista = [];
+
+    if (conheceu.ano) {
+      const data = proximaOcorrencia(conheceu.mes, conheceu.dia, hojeDia);
+      const anos = data.ano - conheceu.ano;
+      lista.push({
+        falta: utcDias(hojeDia, data),
+        titulo: "O dia em que a gente se conheceu",
+        detalhe:
+          formatarDataBR(data.ano, data.mes, data.dia) +
+          " · " +
+          anos +
+          (anos === 1 ? " ano" : " anos"),
+        numero: utcDias(hojeDia, data),
+      });
+      const mil = proximoMultiploDias(CONFIG.dataConheceu, 100, hojeDia);
+      lista.push({
+        falta: mil.falta,
+        titulo: mil.alvo.toLocaleString("pt-BR") + " dias desde que te conheci",
+        detalhe: formatarDataBR(mil.data.ano, mil.data.mes, mil.data.dia),
+        numero: mil.falta,
+      });
+    }
+
+    if (namoro.ano) {
+      const data = proximaOcorrencia(namoro.mes, namoro.dia, hojeDia);
+      const anos = data.ano - namoro.ano;
+      lista.push({
+        falta: utcDias(hojeDia, data),
+        titulo: "O nosso aniversário de namoro",
+        detalhe:
+          formatarDataBR(data.ano, data.mes, data.dia) +
+          " · " +
+          anos +
+          (anos === 1 ? " ano" : " anos"),
+        numero: utcDias(hojeDia, data),
+      });
+    }
+
+    lista.sort(function (a, b) {
+      return a.falta - b.falta;
+    });
+    const vistos = {};
+    const unicos = lista
+      .filter(function (item) {
+        const chave = item.titulo + item.detalhe;
+        if (vistos[chave]) return false;
+        vistos[chave] = true;
+        return true;
+      })
+      .slice(0, 3);
+
+    caixa.textContent = "";
+    unicos.forEach(function (item, i) {
+      const art = document.createElement("article");
+      art.className = "marco-futuro" + (i === 0 ? " proximo" : "");
+      const quando = document.createElement("p");
+      quando.className = "marco-futuro-quando";
+      quando.textContent = textoFalta(item.falta);
+      const dias = document.createElement("span");
+      dias.className = "marco-futuro-dias";
+      dias.textContent = String(Math.max(0, item.falta));
+      const h3 = document.createElement("h3");
+      h3.textContent = item.titulo;
+      const p = document.createElement("p");
+      p.textContent = item.detalhe;
+      art.append(quando, dias, h3, p);
+      caixa.appendChild(art);
+    });
+  }
+
+  function montarQuiz() {
+    const secao = $("#quiz");
+    const caixa = $("#quizCaixa");
+    const perguntas = Array.isArray(CONFIG.quiz)
+      ? CONFIG.quiz.filter(function (q) {
+          return q && q.pergunta && Array.isArray(q.opcoes) && q.opcoes.length;
+        })
+      : [];
+    if (!secao || !caixa || !perguntas.length) return;
+    secao.hidden = false;
+
+    let i = 0;
+    let acertos = 0;
+    let travado = false;
+
+    function pintarResultado() {
+      caixa.textContent = "";
+      caixa.classList.add("quiz-resultado");
+      const olho = document.createElement("p");
+      olho.className = "quiz-progresso";
+      olho.textContent = "fim";
+      const forte = document.createElement("strong");
+      forte.textContent = acertos + " de " + perguntas.length;
+      const p = document.createElement("p");
+      if (acertos === perguntas.length) {
+        p.textContent = "Você lembra de tudo. Eu também.";
+        chuvaDeCoracoes();
+      } else if (acertos >= Math.ceil(perguntas.length / 2)) {
+        p.textContent = "A gente lembra o bastante. O resto eu conto de novo.";
+      } else {
+        p.textContent = "Não tem problema. Eu guardo a história por nós dois.";
+      }
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-cinema";
+      btn.textContent = "Tentar de novo";
+      btn.addEventListener("click", function () {
+        i = 0;
+        acertos = 0;
+        caixa.classList.remove("quiz-resultado");
+        pintarPergunta();
+      });
+      caixa.append(olho, forte, p, btn);
+    }
+
+    function pintarPergunta() {
+      if (i >= perguntas.length) {
+        pintarResultado();
+        return;
+      }
+      travado = false;
+      const q = perguntas[i];
+      caixa.textContent = "";
+      const prog = document.createElement("p");
+      prog.className = "quiz-progresso";
+      prog.textContent = "pergunta " + (i + 1) + " de " + perguntas.length;
+      const h = document.createElement("p");
+      h.className = "quiz-pergunta";
+      h.textContent = q.pergunta;
+      const grade = document.createElement("div");
+      grade.className = "quiz-opcoes";
+      const certa = q.opcoes[q.certa];
+      embaralhar(q.opcoes).forEach(function (texto) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "quiz-opcao";
+        btn.textContent = texto;
+        btn.addEventListener("click", function () {
+          if (travado) return;
+          travado = true;
+          const ok = texto === certa;
+          if (ok) acertos += 1;
+          $$(".quiz-opcao", grade).forEach(function (op) {
+            op.disabled = true;
+            if (op.textContent === certa) op.classList.add("certa");
+            else if (op === btn && !ok) op.classList.add("errada");
+          });
+          window.setTimeout(function () {
+            i += 1;
+            pintarPergunta();
+          }, 850);
+        });
+        grade.appendChild(btn);
+      });
+      caixa.append(prog, h, grade);
+    }
+
+    pintarPergunta();
+  }
+
+  function montarMemoria() {
+    const secao = $("#memoria");
+    const grade = $("#memoriaGrade");
+    const placar = $("#memoriaPlacar");
+    const fim = $("#memoriaFim");
+    const btn = $("#btnMemoria");
+    const fotos = Array.isArray(CONFIG.fotos) ? CONFIG.fotos : [];
+    if (!secao || !grade || fotos.length < 4) return;
+    secao.hidden = false;
+
+    const pares = Math.min(8, fotos.length);
+    let abertas = [];
+    let travado = false;
+    let jogadas = 0;
+    let feitos = 0;
+    let cartas = [];
+
+    function atualizarPlacar() {
+      if (placar) {
+        placar.textContent =
+          feitos +
+          (feitos === 1 ? " par" : " pares") +
+          " · " +
+          jogadas +
+          (jogadas === 1 ? " jogada" : " jogadas");
+      }
+    }
+
+    function montarGrade() {
+      abertas = [];
+      travado = false;
+      jogadas = 0;
+      feitos = 0;
+      if (fim) {
+        fim.hidden = true;
+        fim.textContent = "";
+      }
+      const base = fotos.slice(0, pares).map(function (foto, idx) {
+        return { par: idx, src: foto.src, alt: foto.legenda || "" };
+      });
+      cartas = embaralhar(base.concat(base));
+      grade.textContent = "";
+      cartas.forEach(function (item, indice) {
+        const carta = document.createElement("button");
+        carta.type = "button";
+        carta.className = "memoria-carta";
+        carta.dataset.indice = String(indice);
+        carta.setAttribute("aria-label", "Carta fechada");
+        carta.innerHTML =
+          '<span class="memoria-inner">' +
+          '<span class="memoria-verso" aria-hidden="true">♥</span>' +
+          '<span class="memoria-frente"></span>' +
+          "</span>";
+        const frente = carta.querySelector(".memoria-frente");
+        carregarFoto(frente, item.src, item.alt);
+        carta.addEventListener("click", function () {
+          virar(indice, carta);
+        });
+        grade.appendChild(carta);
+      });
+      atualizarPlacar();
+    }
+
+    function virar(indice, carta) {
+      if (travado) return;
+      if (carta.classList.contains("aberta") || carta.classList.contains("certa")) return;
+      carta.classList.add("aberta");
+      carta.setAttribute("aria-label", cartas[indice].alt || "Carta aberta");
+      abertas.push({ indice: indice, carta: carta });
+      if (abertas.length < 2) return;
+      travado = true;
+      jogadas += 1;
+      atualizarPlacar();
+      const a = abertas[0];
+      const b = abertas[1];
+      const iguais = cartas[a.indice].par === cartas[b.indice].par;
+      window.setTimeout(
+        function () {
+          if (iguais) {
+            a.carta.classList.add("certa");
+            b.carta.classList.add("certa");
+            feitos += 1;
+            atualizarPlacar();
+            if (feitos === pares) {
+              if (fim) {
+                fim.hidden = false;
+                fim.textContent = "Você encontrou a gente, todas as vezes.";
+              }
+              chuvaDeCoracoes();
+            }
+          } else {
+            a.carta.classList.remove("aberta");
+            b.carta.classList.remove("aberta");
+            a.carta.setAttribute("aria-label", "Carta fechada");
+            b.carta.setAttribute("aria-label", "Carta fechada");
+          }
+          abertas = [];
+          travado = false;
+        },
+        iguais ? 280 : 720
+      );
+    }
+
+    if (btn) btn.addEventListener("click", montarGrade);
+    montarGrade();
+  }
+
   function montarPromessas() {
     const ul = $("#listaPromessas");
     CONFIG.promessas.forEach((texto) => {
@@ -1687,6 +2038,29 @@
       return new Date(ano, mes, 0).getDate();
     }
 
+    function contarSequencia() {
+      let ano = hoje.ano;
+      let mes = hoje.mes;
+      let dia = hoje.dia;
+      let n = 0;
+      for (let i = 0; i < 800; i += 1) {
+        const mask = mascaras[chaveMes(ano, mes)] || lerLocal(ano, mes);
+        if (!temDia(mask, dia)) break;
+        n += 1;
+        dia -= 1;
+        if (dia < 1) {
+          mes -= 1;
+          if (mes < 1) {
+            ano -= 1;
+            mes = 12;
+          }
+          if (ano < minAno || (ano === minAno && mes < minMes)) break;
+          dia = diasNoMes(ano, mes);
+        }
+      }
+      return n;
+    }
+
     function lerLocal(ano, mes) {
       try {
         return Number(localStorage.getItem(GUARDA + chaveMes(ano, mes)) || 0) >>> 0;
@@ -1772,9 +2146,17 @@
       if (legenda) {
         if (ehAtual) {
           const veioHoje = temDia(mask, hoje.dia);
-          legenda.textContent = veioHoje
+          const sequencia = contarSequencia();
+          let texto = veioHoje
             ? "Hoje você veio. " + acesos + (acesos === 1 ? " coração aceso" : " corações acesos") + " neste mês."
             : acesos + (acesos === 1 ? " coração aceso" : " corações acesos") + " neste mês.";
+          if (veioHoje && sequencia > 1) {
+            texto +=
+              " " +
+              sequencia +
+              (sequencia === 1 ? " dia seguido." : " dias seguidos.");
+          }
+          legenda.textContent = texto;
         } else {
           legenda.textContent =
             acesos + (acesos === 1 ? " coração aceso" : " corações acesos") + " em " + MESES[mes - 1] + ".";
@@ -1873,6 +2255,9 @@
   iniciarCeu();
   montarRoleta();
   montarPromessas();
+  montarProximosMarcos();
+  montarQuiz();
+  montarMemoria();
   iniciarContadores();
   petalas();
   iniciarBarraAmor();
@@ -1883,7 +2268,7 @@
   document.addEventListener("click", (e) => {
     if (
       e.target.closest(
-        ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .anuncio-aniv, .roleta-cena, .ceu-moldura"
+        ".capa, .barra-amor, .calendario, .btn-musica, a, button, .player-moldura, .lightbox, .polaroid, .cinema, .bilhete-modal, .anuncio-aniv, .roleta-cena, .ceu-moldura, .memoria-grade, .quiz-caixa, .proximos-marcos"
       )
     ) {
       return;

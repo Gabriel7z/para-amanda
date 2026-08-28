@@ -277,6 +277,54 @@ Dorme tranquila sabendo que tem alguém no mundo pensando em você com um sorris
     "Hoje eu te amo simplesmente porque é você. E isso já bastaria.",
   ],
 
+  quiz: [
+    {
+      pergunta: "Em que dia a gente se conheceu?",
+      opcoes: [
+        "22 de outubro de 2022",
+        "23 de agosto de 2023",
+        "22 de agosto de 2022",
+        "23 de outubro de 2022",
+      ],
+      certa: 0,
+    },
+    {
+      pergunta: "Em que dia a gente começou a namorar?",
+      opcoes: [
+        "22 de outubro de 2022",
+        "23 de agosto de 2023",
+        "23 de outubro de 2023",
+        "22 de agosto de 2023",
+      ],
+      certa: 1,
+    },
+    {
+      pergunta: "Qual música diz “porque a gente se completa”?",
+      opcoes: [
+        "Realidade ou Fantasia",
+        "É Por Você Que Canto",
+        "Duas Metades",
+        "A Thousand Years",
+      ],
+      certa: 2,
+    },
+    {
+      pergunta: "O céu do site é de que hora, no dia em que te conheci?",
+      opcoes: [
+        "Meio-dia",
+        "Às seis da tarde",
+        "Às oito da noite",
+        "À meia-noite",
+      ],
+      certa: 2,
+    },
+    {
+      pergunta: "Quantos anos de namoro a gente acabou de completar?",
+      opcoes: ["dois", "três", "quatro", "cinco"],
+      certa: 1,
+    },
+  ],
+
   ceuFrase: "O céu já tinha você. Eu é que ainda não sabia.",
 
   roleta: [
