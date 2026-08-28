@@ -1346,6 +1346,7 @@
           '<span class="memoria-frente"></span>' +
           "</span>";
         const frente = carta.querySelector(".memoria-frente");
+        frente.textContent = "♥";
         carregarFoto(frente, item.src, item.alt);
         carta.addEventListener("click", function () {
           virar(indice, carta);

@@ -834,7 +834,12 @@ code {
 
 .memoria-frente {
   transform: rotateY(180deg);
-  background: #1a0a10;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 45%, #f3c5d0, #c45c74 70%);
+  color: #fff6ea;
+  font-size: 1.4rem;
 }
 
 .memoria-frente img {
